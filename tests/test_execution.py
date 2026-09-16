@@ -131,7 +131,7 @@ def setup_flow():
         quote=snapshot,
         now=NOW + timedelta(seconds=2),
     )
-    return service, orders, evidence, ledger, snapshot, assignment
+    return service, orders, evidence, ledger, snapshot, offer, assignment
 
 
 def pickup_and_evidence(service, evidence, assignment):
@@ -171,12 +171,12 @@ def pickup_and_evidence(service, evidence, assignment):
 
 
 def test_accepted_offer_becomes_one_bound_assignment_idempotently() -> None:
-    service, orders, _, _, snapshot, assignment = setup_flow()
+    service, orders, _, _, snapshot, offer, assignment = setup_flow()
 
     replay = service.confirm_assignment(
         command_id="assign",
         assignment_id=assignment.assignment_id,
-        offer=None,
+        offer=offer,
         quote=snapshot,
         now=NOW + timedelta(seconds=3),
     )
@@ -186,7 +186,7 @@ def test_accepted_offer_becomes_one_bound_assignment_idempotently() -> None:
 
 
 def test_wrong_rider_cannot_pick_up_or_complete_assignment() -> None:
-    service, _, evidence, _, _, assignment = setup_flow()
+    service, _, evidence, _, _, _, assignment = setup_flow()
 
     with pytest.raises(ValueError, match="ASSIGNMENT_RIDER_MISMATCH"):
         service.mark_picked_up(
@@ -208,7 +208,7 @@ def test_wrong_rider_cannot_pick_up_or_complete_assignment() -> None:
 
 
 def test_delivery_requires_matching_signed_proof_and_packaging_seal() -> None:
-    service, _, evidence, _, _, assignment = setup_flow()
+    service, _, evidence, _, _, _, assignment = setup_flow()
     assignment, packaging, receipt = pickup_and_evidence(service, evidence, assignment)
 
     with pytest.raises(ValueError, match="PACKAGING_SEAL_MISMATCH"):
@@ -232,7 +232,7 @@ def test_delivery_requires_matching_signed_proof_and_packaging_seal() -> None:
 
 
 def test_delivery_completion_is_bound_and_idempotent() -> None:
-    service, orders, evidence, _, _, assignment = setup_flow()
+    service, orders, evidence, _, _, _, assignment = setup_flow()
     assignment, packaging, receipt = pickup_and_evidence(service, evidence, assignment)
     completed = service.complete_delivery(
         command_id="complete",
@@ -257,7 +257,7 @@ def test_delivery_completion_is_bound_and_idempotent() -> None:
 
 
 def test_settlement_requires_delivery_and_exact_persisted_quote() -> None:
-    service, _, evidence, ledger, snapshot, assignment = setup_flow()
+    service, _, evidence, ledger, snapshot, _, assignment = setup_flow()
     with pytest.raises(ValueError, match="DELIVERY_REQUIRED_BEFORE_SETTLEMENT"):
         service.settle(
             command_id="settle-early",
@@ -292,7 +292,7 @@ def test_settlement_requires_delivery_and_exact_persisted_quote() -> None:
 
 
 def test_balanced_settlement_is_recorded_once_after_verified_delivery() -> None:
-    service, orders, evidence, ledger, snapshot, assignment = setup_flow()
+    service, orders, evidence, ledger, snapshot, _, assignment = setup_flow()
     assignment, packaging, receipt = pickup_and_evidence(service, evidence, assignment)
     assignment = service.complete_delivery(
         command_id="complete",
@@ -332,7 +332,7 @@ def test_balanced_settlement_is_recorded_once_after_verified_delivery() -> None:
 
 
 def test_settlement_replay_cannot_change_transaction_identity() -> None:
-    service, _, evidence, _, snapshot, assignment = setup_flow()
+    service, _, evidence, _, snapshot, _, assignment = setup_flow()
     assignment, packaging, receipt = pickup_and_evidence(service, evidence, assignment)
     assignment = service.complete_delivery(
         command_id="complete",

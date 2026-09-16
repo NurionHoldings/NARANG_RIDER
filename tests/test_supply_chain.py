@@ -1,9 +1,20 @@
+import importlib.util
 import json
+import sys
 from pathlib import Path
 
 import pytest
 
-from scripts.check_supply_chain import ROOT, SupplyChainError, artifact_manifest, check
+CHECKER_PATH = Path(__file__).resolve().parents[1] / "scripts" / "check_supply_chain.py"
+SPEC = importlib.util.spec_from_file_location("narang_supply_chain_check", CHECKER_PATH)
+assert SPEC is not None and SPEC.loader is not None
+CHECKER = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = CHECKER
+SPEC.loader.exec_module(CHECKER)
+ROOT = CHECKER.ROOT
+SupplyChainError = CHECKER.SupplyChainError
+artifact_manifest = CHECKER.artifact_manifest
+check = CHECKER.check
 
 
 def test_repository_supply_chain_inventory_is_consistent():

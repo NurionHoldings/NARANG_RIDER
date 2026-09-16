@@ -33,6 +33,8 @@ jobs:
         run: python -m pip wheel . --no-deps --no-build-isolation --wheel-dir build/wheels
       - name: Generate SBOM
         run: python scripts/generate_sbom.py
+      - name: Verify supply-chain provenance and license policy
+        run: python scripts/check_supply_chain.py
       - name: Synthetic backup restore contract
         run: PYTHONPATH=src python -c "from narang_rider.release_security import synthetic_backup_restore as r; assert r({'orders':[{'id':'synthetic-1'}]})['synthetic']"
       - uses: actions/upload-artifact@v4
@@ -40,6 +42,7 @@ jobs:
           name: release-evidence
           path: |
             build/sbom.cdx.json
+            build/supply-chain-provenance.json
             build/wheels/*.whl
           if-no-files-found: error
           retention-days: 14

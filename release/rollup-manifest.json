@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "version": "0.1.0-rc.6",
+  "version": "0.1.0-rc.7",
   "purpose": "REVIEW_ONLY",
-  "source_branch": "feat/061-professional-review-packet",
-  "source_head": "385351fadfd6fdfb57eeb5f42d940df8d1cf3a5e",
-  "rollup_branch": "feat/062-review-rollup-rc6",
+  "source_branch": "feat/063-external-blocker-tracking",
+  "source_head": "caaf85b353a9c6ca58c664bf5f3890523a77fe53",
+  "rollup_branch": "feat/064-review-rollup-rc7",
   "target_branch": "main",
   "expected_initial_main_commit": "8ea1e56774d9de350b9b8455e58fa98a95f94c14",
   "included_pull_requests": [
@@ -68,7 +68,9 @@
     58,
     59,
     60,
-    61
+    61,
+    62,
+    63
   ],
   "required_checks": [
     "Unit contracts and lint",
@@ -86,7 +88,8 @@
     "Synthetic migration and recovery safety drill",
     "External provider evidence intake packet",
     "Independent professional review packet",
-    "Operator next-action completeness"
+    "Operator next-action completeness",
+    "External blocker integrity"
   ],
   "review_order": [
     "safety_legal_floors_and_arkaon_authority",
@@ -129,5 +132,49 @@
   ],
   "operator_approval_required": true,
   "auto_merge_forbidden": true,
-  "deployment_forbidden": true
+  "deployment_forbidden": true,
+  "external_blocker_issues": [
+    {
+      "id": "EXT-01",
+      "issue_number": 64,
+      "url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/64",
+      "status": "PENDING"
+    },
+    {
+      "id": "EXT-02",
+      "issue_number": 65,
+      "url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/65",
+      "status": "PENDING"
+    },
+    {
+      "id": "EXT-03",
+      "issue_number": 66,
+      "url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/66",
+      "status": "PENDING"
+    },
+    {
+      "id": "EXT-04",
+      "issue_number": 67,
+      "url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/67",
+      "status": "PENDING"
+    },
+    {
+      "id": "EXT-05",
+      "issue_number": 68,
+      "url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/68",
+      "status": "PENDING"
+    },
+    {
+      "id": "EXT-06",
+      "issue_number": 69,
+      "url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/69",
+      "status": "PENDING"
+    },
+    {
+      "id": "EXT-07",
+      "issue_number": 70,
+      "url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/70",
+      "status": "PENDING"
+    }
+  ]
 }

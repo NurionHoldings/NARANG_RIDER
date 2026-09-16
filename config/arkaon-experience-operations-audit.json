@@ -1,0 +1,10 @@
+{
+  "schema_version": "narang.arkaon-experience-operations-audit.v1",
+  "areas": ["CONTENT", "PLACEMENT", "HOME_READABILITY", "ACCESSIBILITY", "NAVIGATION", "ROUTE_CONSISTENCY", "OFFICIAL_BENCHMARK"],
+  "trigger": "ON_EVERY_REVIEW_BRANCH_CHANGE_AND_SCHEDULED_SCAN",
+  "maximum_outcome": "IMPROVEMENT_PROPOSAL",
+  "official_benchmark_only": true,
+  "competitor_copy_allowed": false,
+  "automatic_change_allowed": false,
+  "operator_approval_required": true
+}

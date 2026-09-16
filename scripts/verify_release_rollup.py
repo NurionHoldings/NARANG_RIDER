@@ -17,6 +17,7 @@ def main() -> int:
     parser.add_argument("--manifest", default="release/rollup-manifest.json")
     parser.add_argument("--evidence", default="release/evidence.json")
     parser.add_argument("--output", default="build/release-rollup-report.json")
+    parser.add_argument("--head", default="HEAD")
     args = parser.parse_args()
     manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
     evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8"))
@@ -43,9 +44,9 @@ def main() -> int:
         failures.append("declared source head is unavailable")
     if git("merge-base", "--is-ancestor", main_commit, source_head).returncode:
         failures.append("source head does not descend from expected initial main")
-    if git("merge-base", "--is-ancestor", source_head, "HEAD").returncode:
+    if git("merge-base", "--is-ancestor", source_head, args.head).returncode:
         failures.append("rollup HEAD does not include declared source head")
-    merge_commits = git("rev-list", "--merges", f"{main_commit}..HEAD")
+    merge_commits = git("rev-list", "--merges", f"{main_commit}..{args.head}")
     if merge_commits.returncode or merge_commits.stdout.strip():
         failures.append("rollup history contains merge commits or cannot be inspected")
 

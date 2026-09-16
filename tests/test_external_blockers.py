@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from narang_rider.external_readiness import build_operator_dashboard, external_readiness_api
-from scripts.validate_external_blockers import (
+from narang_rider.external_blockers import (
     BlockerValidationError,
     load_registry,
     validate_registry,

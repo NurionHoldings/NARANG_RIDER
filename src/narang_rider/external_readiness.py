@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from scripts.validate_external_blockers import load_registry, registry_digest, validate_registry
+from .external_blockers import load_registry, registry_digest, validate_registry
 
 DEFAULT_REGISTRY = Path(__file__).resolve().parents[2] / "config" / "external-blockers.json"
 

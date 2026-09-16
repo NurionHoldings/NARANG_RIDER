@@ -66,6 +66,7 @@ export interface JourneyAction {
   id: string;
   label: string;
   route: RouteName;
+  destructive?: boolean;
 }
 
 export const journeys: Readonly<Record<PortalRole, readonly JourneyAction[]>> = {
@@ -76,7 +77,7 @@ export const journeys: Readonly<Record<PortalRole, readonly JourneyAction[]>> = 
     { id: "call", label: "라이더 호출", route: "merchantRiderCall" },
     { id: "packaging", label: "포장·봉인 기록", route: "merchantPackaging" },
     { id: "status", label: "주문상태 확인", route: "merchantOrderStatus" },
-    { id: "cancel", label: "주문 취소 요청", route: "merchantCancel" },
+    { id: "cancel", label: "주문 취소 요청", route: "merchantCancel", destructive: true },
   ],
   rider: [
     { id: "availability", label: "운행 가능상태 변경", route: "riderAvailability" },
@@ -86,7 +87,7 @@ export const journeys: Readonly<Record<PortalRole, readonly JourneyAction[]>> = 
     { id: "pickup", label: "픽업 완료", route: "riderProgress" },
     { id: "proof", label: "촬영권한 요청", route: "riderProofGrant" },
     { id: "deliver", label: "배송 완료", route: "riderDelivery" },
-    { id: "incident", label: "안전 중지 및 지원 요청", route: "riderIncident" },
+    { id: "incident", label: "안전 중지 및 지원 요청", route: "riderIncident", destructive: true },
     { id: "earnings", label: "수익 확인", route: "riderEarnings" },
   ],
   customer: [
@@ -101,7 +102,7 @@ export const journeys: Readonly<Record<PortalRole, readonly JourneyAction[]>> = 
     { id: "aggregate", label: "집계 현황 새로고침", route: "branchDashboard" },
     { id: "readiness", label: "준비상태 확인", route: "branchReadiness" },
     { id: "incidents", label: "사고·장애 확인", route: "branchIncidents" },
-    { id: "pause", label: "운영 일시정지 요청", route: "branchCommand" },
+    { id: "pause", label: "운영 일시정지 요청", route: "branchCommand", destructive: true },
     { id: "pause-approval", label: "일시정지 독립 승인", route: "branchCommandApproval" },
     { id: "settlement", label: "정산 독립 승인", route: "branchSettlementApproval" },
     { id: "pilot", label: "파일럿 체크리스트", route: "branchPilotChecklist" },

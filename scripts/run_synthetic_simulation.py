@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Run a bounded, synthetic-only NARANG RIDER simulation."""
 
 from __future__ import annotations

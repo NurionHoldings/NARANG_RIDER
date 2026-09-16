@@ -1,3 +1,4 @@
+# ruff: noqa
 from datetime import UTC,datetime
 import pytest
 from narang_rider.connector import *

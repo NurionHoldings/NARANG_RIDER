@@ -91,6 +91,9 @@ jobs:
       - name: Python compile, source shape and import-cycle contracts
         run: python scripts/check_python_quality.py
 
+      - name: Critical coverage gap inventory
+        run: python scripts/check_coverage_gaps.py
+
       - name: Operational handoff reference freshness
         run: PYTHONPATH=src python scripts/verify_handoff_refs.py
 

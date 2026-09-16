@@ -62,12 +62,41 @@ CREATE TABLE ledger_entries (
     transaction_id text NOT NULL,
     entry_sequence integer NOT NULL CHECK (entry_sequence >= 0),
     account_code text NOT NULL,
-    amount_won bigint NOT NULL,
+    amount_won bigint NOT NULL CHECK (amount_won <> 0),
     created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
     PRIMARY KEY (branch_id, transaction_id, entry_sequence),
     FOREIGN KEY (branch_id, transaction_id)
         REFERENCES ledger_transactions (branch_id, record_id) ON DELETE RESTRICT
 );
+
+CREATE FUNCTION enforce_balanced_ledger_transaction() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM ledger_entries
+        WHERE branch_id = NEW.branch_id AND transaction_id = NEW.transaction_id
+        OFFSET 1
+    ) OR (
+        SELECT COALESCE(sum(amount_won), 0) FROM ledger_entries
+        WHERE branch_id = NEW.branch_id AND transaction_id = NEW.transaction_id
+    ) <> 0 THEN
+        RAISE EXCEPTION 'unbalanced ledger transaction' USING ERRCODE = '23514';
+    END IF;
+    RETURN NULL;
+END;
+$$;
+
+CREATE CONSTRAINT TRIGGER balanced_ledger_transaction
+AFTER INSERT ON ledger_entries
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW EXECUTE FUNCTION enforce_balanced_ledger_transaction();
+
+CREATE FUNCTION reject_append_only_mutation() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION 'append-only record mutation forbidden' USING ERRCODE = '42501';
+END;
+$$;
 
 CREATE TABLE outbox_messages (
     branch_id text NOT NULL,
@@ -131,6 +160,19 @@ CREATE TABLE audit_receipts (
     FOREIGN KEY (branch_id, idempotency_key)
         REFERENCES idempotency_records (branch_id, idempotency_key)
 );
+
+CREATE TRIGGER immutable_ledger_transactions
+BEFORE UPDATE OR DELETE ON ledger_transactions
+FOR EACH ROW EXECUTE FUNCTION reject_append_only_mutation();
+CREATE TRIGGER immutable_ledger_entries
+BEFORE UPDATE OR DELETE ON ledger_entries
+FOR EACH ROW EXECUTE FUNCTION reject_append_only_mutation();
+CREATE TRIGGER immutable_idempotency_records
+BEFORE UPDATE OR DELETE ON idempotency_records
+FOR EACH ROW EXECUTE FUNCTION reject_append_only_mutation();
+CREATE TRIGGER immutable_audit_receipts
+BEFORE UPDATE OR DELETE ON audit_receipts
+FOR EACH ROW EXECUTE FUNCTION reject_append_only_mutation();
 
 INSERT INTO schema_migrations (version) VALUES (1);
 

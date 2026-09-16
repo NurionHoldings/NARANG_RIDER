@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["environment", "database_config_ref", "jwks_config_ref", "webhook_secret_ref", "allowed_origins", "deployment_enabled"],
+  "properties": {
+    "environment": {"enum": ["dev", "staging", "prod"]},
+    "database_config_ref": {"type": "string", "pattern": "^config://"},
+    "jwks_config_ref": {"type": "string", "pattern": "^config://"},
+    "webhook_secret_ref": {"type": "string", "pattern": "^config://"},
+    "allowed_origins": {"type": "array", "items": {"type": "string", "pattern": "^https://"}, "uniqueItems": true},
+    "debug": {"type": "boolean", "default": false},
+    "deployment_enabled": {"const": false}
+  }
+}

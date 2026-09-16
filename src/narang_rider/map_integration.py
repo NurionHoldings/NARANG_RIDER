@@ -6,11 +6,12 @@ current official documentation.  This module never persists destinations.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from hashlib import sha256
-from typing import Callable, Protocol
+from typing import Protocol
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 
@@ -37,7 +38,7 @@ class OfficialSource:
     provenance_digest: str
 
     @classmethod
-    def create(cls, title: str, url: str, accessed_on: str) -> "OfficialSource":
+    def create(cls, title: str, url: str, accessed_on: str) -> OfficialSource:
         digest = sha256(f"{title}\n{url}\n{accessed_on}".encode()).hexdigest()
         return cls(title, url, accessed_on, digest)
 

@@ -91,6 +91,7 @@ def test_schema_has_tenant_keys_rls_dedupe_and_outbox_lock_contract() -> None:
         "ledger_transactions",
         "ledger_entries",
         "outbox_messages",
+        "outbox_review_events",
         "idempotency_records",
         "audit_receipts",
     ):

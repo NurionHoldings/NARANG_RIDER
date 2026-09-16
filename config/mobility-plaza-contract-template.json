@@ -1,0 +1,36 @@
+{
+  "schema": "narang.mobility-plaza-contract-template.v1",
+  "template_id": "MOBILITY-PLAZA-PARTNER-SYNTHETIC",
+  "version": "1.0.0-draft",
+  "status": "LEGAL_REVIEW_REQUIRED",
+  "production_approved": false,
+  "variable_allowlist": ["company_name", "partner_name", "vertical", "fee_terms", "effective_date", "expiry_date"],
+  "clauses": {
+    "parties_and_authority": "{{company_name}}와 {{partner_name}}는 권한이 검증된 대표자를 통해 본 계약을 체결한다.",
+    "service_scope": "입점 범위는 {{vertical}} 합성 Sandbox로 제한하며 실제 영업은 별도 승인 전 금지한다.",
+    "fees_and_sponsorship": "수수료 조건은 {{fee_terms}}이며 후원·소개수수료를 비교점수와 분리하여 공개한다.",
+    "consumer_and_financial_boundary": "금융 승인·보험 인수·상품 적합성·계약은 자격을 갖춘 입점업체의 책임과 시스템에서 처리한다.",
+    "personal_data_boundary": "목적별 최소처리 원칙을 적용하고 배차·위치·주문·정산자료와 금융·보험자료를 기본적으로 결합하지 않는다.",
+    "security_and_incident": "당사자는 접근통제·암호화·사고통지·증거보존 의무와 담당 역할을 별도 보안부속서에 따른다.",
+    "monitoring_and_audit": "ARKAON은 근거·계약·약관·시험의 변경을 감시하여 사람 검토를 요청할 수 있으나 자동 제재할 수 없다.",
+    "term_renewal_termination": "계약기간은 {{effective_date}}부터 {{expiry_date}}까지이며 변경·갱신은 새 문서와 재서명을 요구한다.",
+    "dispute_and_notice": "분쟁·시정·해지 통지는 계약상 지정된 사람 담당자와 검증된 채널을 통해 처리한다.",
+    "electronic_document_and_signature": "양 당사자는 동일 digest의 전자문서를 확인하고 권한 있는 자연인의 전자서명으로 의사를 표시한다.",
+    "arkaon_authority_limit": "ARKAON은 문서 준비·제시·감시를 지원할 뿐 계약 당사자·대리인·서명자·최종 승인자가 아니다."
+  },
+  "execution_policy": {
+    "prepayment_eligibility_and_refund_disclosures_required": true,
+    "operator_sets_onboarding_and_usage_fees": true,
+    "arkaon_discretionary_fee_change": false,
+    "verified_payment_required_before_drafting": true,
+    "registered_representative_identity_match_required": true,
+    "representative_signature_auto_executes_preapproved_contract": true
+  },
+  "ux_reference": {
+    "source": "https://airoffice.kr/",
+    "observed_on": "2026-09-16",
+    "adapted_pattern": ["단계형 진행표시", "결제 전 제한조건 확인", "결제 전 환불조건 확인", "필요정보 최소입력", "결제 후 계약문서 전달"],
+    "copy_or_brand_reuse": false
+  },
+  "notice": "This is a synthetic engineering template, not legal advice or an approved production contract."
+}

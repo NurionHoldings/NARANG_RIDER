@@ -1,0 +1,36 @@
+{
+  "schema_version": "narang.mobility-plaza-lifecycle-policy.v1",
+  "synthetic_only": true,
+  "activation": {
+    "required_contract_states": ["executed", "auto_executed"],
+    "authority": "PREAPPROVED_POLICY_ENGINE",
+    "exact_entitlement_allowlist_required": true,
+    "production_activation_allowed": false
+  },
+  "arkaon": {
+    "allowed_actions": ["OBSERVE", "EXPLAIN", "RECOMMEND_REVIEW"],
+    "forbidden_actions": [
+      "ACTIVATE",
+      "CHANGE_ENTITLEMENTS",
+      "SUSPEND",
+      "TERMINATE",
+      "RENEW",
+      "WAIVE_FEES",
+      "CHANGE_CONTRACT"
+    ]
+  },
+  "monitoring": {
+    "signals": ["RENEWAL_WINDOW", "COMPLIANCE_STALE", "PAYMENT_OVERDUE"],
+    "maximum_automated_outcome": "HUMAN_REVIEW",
+    "cross_partner_data_use": false
+  },
+  "termination": {
+    "dual_control_required": true,
+    "same_operator_request_and_confirmation_forbidden": true
+  },
+  "amendment": {
+    "in_place_mutation_forbidden": true,
+    "executed_superseding_contract_required": true,
+    "same_partner_required": true
+  }
+}

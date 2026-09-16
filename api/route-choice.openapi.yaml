@@ -1,0 +1,18 @@
+paths:
+  /api/v1/rider/routes/evaluate:
+    post:
+      operationId: evaluateRiderRouteAlternatives
+      summary: 라이더 선택용 경로 대안 평가
+      security: [{cookieSession: []}]
+      parameters:
+        - {name: X-CSRF-Token, in: header, required: true, schema: {type: string}}
+        - {name: Idempotency-Key, in: header, required: true, schema: {type: string}}
+      responses:
+        "200": {description: 설명·불확실성·비용·보수하한을 포함한 대안}
+        "422": {description: 오래되거나 오토바이 적합성이 검증되지 않은 경로}
+      x-narang-controls:
+        rider-choice: required
+        arkaon-authority: advisory-only
+        continuous-tracking: forbidden
+        downward-pay-change: forbidden
+        exact-location-in-payload: forbidden

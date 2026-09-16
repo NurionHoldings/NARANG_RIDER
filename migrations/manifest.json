@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "migrations": [
+    {"version":1,"up":"migrations/0001_postgres_persistence.sql","up_sha256":"68be3242587d226986483ebe8e6b4887d6098a1435af599331504e0d82ffedbc","down":"migrations/0001_postgres_persistence.down.sql","down_sha256":"0bd03ffe991392eac8f4933a2a8bd014080cfbf7b9355b5b1c028576061093b1","down_safety":"forward-only","protects":["ledger","audit","idempotency","outbox"]},
+    {"version":2,"up":"migrations/0002_settlement_operations.sql","up_sha256":"4174075cd532cb2a3fbc64239226ff4c361c676620753f6efaeefc7c813916f7","down":"migrations/0002_settlement_operations.down.sql","down_sha256":"f2573c22fe89717f5dbef65c6ae1bfb0e4375965d3ea1be711cbf807f1416aea","down_safety":"forward-only","protects":["settlement","payout","disputes"]},
+    {"version":3,"up":"migrations/0003_control_center.sql","up_sha256":"eddef4efd4ae37c54b6f597326a7fe5f94b8f03ecb78beef4722f4fca9195988","down":"migrations/0003_control_center.down.sql","down_sha256":"5311304391dff36ff205e23c5302c582c9039d80e0cdfa8d648e5b2c8be60cf2","down_safety":"forward-only","protects":["control-audit","branch-policy"]},
+    {"version":4,"up":"migrations/0004_rider_incident_support.sql","up_sha256":"b8ac78a05d32d9fd715e46413f3f4a810e847c91e2e88d36a32411ef72166d67","down":"migrations/0004_rider_incident_support.down.sql","down_sha256":"181e03bb77f3662d3db225275e780e0b53d81f81ccee16a633abd03980013623","down_safety":"forward-only","protects":["coverage-snapshot","incident-audit"]},
+    {"version":5,"up":"migrations/0005_notification_delivery.sql","up_sha256":"84c3a4bf471d1de5807de4e3d244415306803ad53d70eb404ac82b518c2604ad","down":"migrations/0005_notification_delivery.down.sql","down_sha256":"9ca7b1bf4da554aa1934c9196a5319430293c59bc228332bfe81192899148347","down_safety":"forward-only","protects":["notification-audit","rights"]}
+  ]
+}

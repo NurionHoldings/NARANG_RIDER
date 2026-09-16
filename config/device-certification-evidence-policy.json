@@ -1,0 +1,31 @@
+{
+  "schema": "narang.device-certification-evidence-policy.v1",
+  "version": "1.0.0",
+  "required_scenarios": [
+    "installed_launch",
+    "app_unavailable",
+    "update_required",
+    "os_restricted",
+    "offline",
+    "return_state_single_use",
+    "accessibility"
+  ],
+  "privacy": {
+    "device_serial": false,
+    "advertising_id": false,
+    "imei": false,
+    "rider_order_identity": false,
+    "address_or_coordinates": false,
+    "device_class_hash_only": true
+  },
+  "integrity": {
+    "signature_required": true,
+    "registered_verifier_key_required": true,
+    "nonce_single_use": true,
+    "maximum_validity_minutes": 60
+  },
+  "automatic_provider_verification": false,
+  "automatic_runtime_activation": false,
+  "external_gate": "EXT-05_PENDING",
+  "production_status": "BLOCKED"
+}

@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info:
+  title: NARANG RIDER Mobile Navigation Bridge
+  version: 0.1.0-rc.7
+  description: Supplemental BLOCKED contract pending physical-device certification.
+paths:
+  /api/v1/rider/assignments/{assignment_id}/navigation/device-launches:
+    post:
+      operationId: createDeviceNavigationLaunch
+      summary: Prepare a single-use launch after a foreground rider gesture
+      parameters:
+        - {name: assignment_id, in: path, required: true, schema: {type: string}}
+        - {name: X-Branch-Id, in: header, required: true, schema: {type: string}}
+        - {name: X-CSRF-Token, in: header, required: true, schema: {type: string}}
+        - {name: Idempotency-Key, in: header, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [provider_id, platform, session_id, destination_token, launch_token, foreground_user_gesture]
+              properties:
+                provider_id: {type: string}
+                platform: {enum: [android, ios, mobile_web]}
+                session_id: {type: string}
+                destination_token: {type: string, description: One-time opaque reference}
+                launch_token: {type: string, description: Single-use two-minute token}
+                foreground_user_gesture: {type: boolean, const: true}
+      responses:
+        "201": {description: Certified launch instruction with noopener,noreferrer policy}
+        "403": {description: Scope mismatch or background launch}
+        "409": {description: Token replay or idempotency conflict}
+        "410": {description: Launch/session expired}
+        "422": {description: Target or return state failed validation}
+        "503": {description: App unavailable, offline, OS restricted, stale knowledge, or uncertified form}
+  /api/v1/rider/assignments/{assignment_id}/navigation/returns:
+    post:
+      operationId: validateDeviceNavigationReturn
+      summary: Consume a scope-bound single-use return state
+      responses:
+        "204": {description: Return state consumed; resume delivery workflow}
+        "403": {description: Cross-rider, order, assignment, branch, or session state}
+        "410": {description: Return state expired or already consumed}

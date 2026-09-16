@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "audit_id": "NARANG_RIDER-054",
+  "base_commit": "0ec37c0624959ec03eff3a453ba00152148e4865",
+  "method": "static-critical-decision-inventory",
+  "numeric_coverage_claimed": false,
+  "tooling_note": "coverage.py/pytest-cov is not pinned; no percentage is asserted. Evidence is test execution plus AST-verified test references and source hashes.",
+  "bugbot_note": "Bugbot was unavailable due to usage limits. This is an independent internal substitute, not external approval.",
+  "verdict": "BLOCKED",
+  "unreviewed_critical_gaps": 0,
+  "critical_modules": [
+    {
+      "path": "src/narang_rider/authentication.py",
+      "sha256": "763e507c6fec981788aeaa04fb3d39f9c201abf8e41742a59a5b52165cb28314",
+      "decisions": [
+        {
+          "id": "jwt-alg-key-signature",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_authentication.py::test_none_and_algorithm_confusion_are_rejected_before_crypto",
+            "tests/test_authentication.py::test_unknown_kid_refreshes_once_then_fails_closed"
+          ]
+        },
+        {
+          "id": "jwt-claim-types-envelope-bounds",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_coverage_gap_audit.py::test_auth_rejects_mixed_audience_and_boolean_numeric_dates",
+            "tests/test_coverage_gap_audit.py::test_auth_rejects_oversized_or_non_object_claim_segments"
+          ]
+        },
+        {
+          "id": "server-authority-replay",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_authentication.py::test_claim_roles_are_ignored_and_server_authority_is_loaded",
+            "tests/test_authentication.py::test_privileged_token_requires_unique_jti"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/postgres.py",
+      "sha256": "a02bee08395236279dcaeac5998d7c384ff2cf9db60a0361098c3562506e5016",
+      "decisions": [
+        {
+          "id": "rls-tenant-keys",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_postgres.py::test_schema_has_tenant_keys_rls_dedupe_and_outbox_lock_contract",
+            "tests/test_postgres.py::test_cross_branch_and_raw_pii_are_rejected_before_sql"
+          ]
+        },
+        {
+          "id": "live-postgres-driver-platform",
+          "disposition": "deferred-reviewed",
+          "rationale": "Live PostgreSQL execution remains in its dedicated optional integration job; unit CI proves SQL shape and fail-closed adapter behavior without adding a network dependency."
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/persistence.py",
+      "sha256": "592fb52d87a88bd4c663fc0475f5237631585e4f3f906a30bab491989ee99c2c",
+      "decisions": [
+        {
+          "id": "atomic-ledger-outbox",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_coverage_gap_audit.py::test_financial_outbox_cannot_commit_without_ledger_counterpart",
+            "tests/test_persistence.py::test_crash_before_publish_rolls_back_and_retry_can_commit"
+          ]
+        },
+        {
+          "id": "nested-pii-idempotency",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_coverage_gap_audit.py::test_persistence_rejects_nested_tuple_pii_before_staging",
+            "tests/test_persistence.py::test_idempotency_key_payload_change_fails_closed"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/ledger.py",
+      "sha256": "96fef0bbe1023142c21652e96865370a84045bdab8bccf9d498ec22d0592fbc8",
+      "decisions": [
+        {
+          "id": "balanced-entry",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_foundation.py::test_public_quote_pays_distance_wait_and_return_and_balances"
+          ]
+        },
+        {
+          "id": "policy-provenance",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_coverage_gap_audit.py::test_ledger_rejects_missing_policy_provenance_even_when_balanced"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/settlement_operations.py",
+      "sha256": "ba32a3fa073f37daa0191476d3e64d448f3fdd6487956d933c977016b2f5dfda",
+      "decisions": [
+        {
+          "id": "deduction-dispute-dual-control",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_settlement_operations.py::test_forged_deduction_and_negative_net_are_rejected",
+            "tests/test_settlement_operations.py::test_stale_duplicate_and_dual_control_abuse_are_blocked"
+          ]
+        },
+        {
+          "id": "callback-no-clawback",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_settlement_operations.py::test_callback_success_replay_and_mismatch_go_to_human_review_without_clawback"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/payments.py",
+      "sha256": "a91ff8dbfea7b85d27e575bc5abc2e6f0d2c9769a7cf899a0f06d3e600b9eeec",
+      "decisions": [
+        {
+          "id": "webhook-order-binding",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_payments.py::test_forged_stale_and_wrong_amount_events_fail_closed",
+            "tests/test_payments.py::test_duplicate_event_is_idempotent_but_cannot_be_rebound"
+          ]
+        },
+        {
+          "id": "payout-ledger-control",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_payments.py::test_payout_requires_settled_binding_and_exact_rider_payable",
+            "tests/test_payments.py::test_payout_blocks_unsettled_duplicate_and_swapped_ledger"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/dispatch.py",
+      "sha256": "e428663c0b968ec4f2be841545c7892679d867d8842a63060f2e781c3699996b",
+      "decisions": [
+        {
+          "id": "fifo-no-retaliation",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_foundation.py::test_longest_available_eligible_rider_is_selected_with_receipt",
+            "tests/test_foundation.py::test_decline_history_cannot_change_fair_selection"
+          ]
+        },
+        {
+          "id": "prohibited-ranking",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_foundation.py::test_abusive_discriminatory_or_ai_ranking_feature_fails_closed"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/evidence.py",
+      "sha256": "0d6effc301790dc9f7697a493543fa4d99027d80a8d63ef57a26b272f2a7ddc0",
+      "decisions": [
+        {
+          "id": "nonce-photo-reuse",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_evidence.py::test_grant_binding_expiry_and_notice_fail_closed",
+            "tests/test_evidence.py::test_duplicate_photo_reuse_across_grants_is_rejected"
+          ]
+        },
+        {
+          "id": "mask-retention",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_evidence.py::test_doorplate_is_only_accepted_after_masking_and_original_discard",
+            "tests/test_evidence.py::test_expiry_deletes_normal_original_but_legal_hold_preserves_and_audits"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/outbox_worker.py",
+      "sha256": "387bf061a2e8cc4ecd5058d844c3ba1b104346e6f20cbd74fc9947154874c621",
+      "decisions": [
+        {
+          "id": "lease-retry",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_outbox_worker.py::test_crash_after_send_before_ack_recovers_with_same_delivery_key",
+            "tests/test_outbox_worker.py::test_retry_backoff_is_deterministic_and_ack_only_follows_success"
+          ]
+        },
+        {
+          "id": "ordering-dlq",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_outbox_worker.py::test_ordering_gap_blocks_later_financial_or_rider_status_event",
+            "tests/test_outbox_worker.py::test_dead_letter_is_audited_for_human_review_without_financial_adjustment"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/api_contract.py",
+      "sha256": "3e2f7d05f99fa92ef27f2bbba7565aca391523eddbd599e0a1291c1d13953fb7",
+      "decisions": [
+        {
+          "id": "auth-branch-idempotency",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_api_contract.py::test_verified_principal_cannot_cross_branch_via_header",
+            "tests/test_api_contract.py::test_idempotency_header_is_required_for_mutation"
+          ]
+        },
+        {
+          "id": "pii-parser",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_api_contract.py::test_raw_pii_fields_are_rejected_without_echo"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/narang_rider/release_candidate.py",
+      "sha256": "7f082398017e0f1c87727b6089160bf7c143c95952298ac99e27ee172d841b36",
+      "decisions": [
+        {
+          "id": "external-blockers",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_release_candidate.py::test_release_is_blocked_without_external_and_governance_evidence",
+            "tests/test_release_candidate.py::test_complete_evidence_only_reaches_operator_review_not_deployment"
+          ]
+        },
+        {
+          "id": "freeze-dual-approval",
+          "disposition": "covered",
+          "evidence": [
+            "tests/test_release_candidate.py::test_freeze_exception_requires_reason_risk_rollback_and_dual_approval"
+          ]
+        }
+      ]
+    }
+  ]
+}
+

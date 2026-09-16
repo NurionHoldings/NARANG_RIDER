@@ -1,0 +1,14 @@
+BEGIN;
+DROP TABLE IF EXISTS audit_receipts;
+DROP TABLE IF EXISTS idempotency_records;
+DROP TABLE IF EXISTS outbox_review_events;
+DROP TABLE IF EXISTS outbox_messages;
+DROP TABLE IF EXISTS ledger_entries;
+DROP FUNCTION IF EXISTS enforce_balanced_ledger_transaction();
+DROP TABLE IF EXISTS ledger_transactions;
+DROP FUNCTION IF EXISTS reject_append_only_mutation();
+DROP TABLE IF EXISTS rider_calls;
+DROP TABLE IF EXISTS partner_events;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS schema_migrations;
+COMMIT;

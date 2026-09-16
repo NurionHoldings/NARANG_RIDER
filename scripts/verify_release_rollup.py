@@ -18,10 +18,12 @@ def main() -> int:
     parser.add_argument("--manifest", default="release/rollup-manifest.json")
     parser.add_argument("--evidence", default="release/evidence.json")
     parser.add_argument("--output", default="build/release-rollup-report.json")
+    parser.add_argument("--actions", default="release/operator-next-actions.json")
     parser.add_argument("--head", default="HEAD")
     args = parser.parse_args()
     manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
     evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8"))
+    actions = json.loads(Path(args.actions).read_text(encoding="utf-8"))
     failures: list[str] = []
 
     expected_prs = list(range(1, 62))
@@ -87,6 +89,19 @@ def main() -> int:
     for blocker in manifest["blockers"]:
         if evidence_by_category.get(blocker) not in {"missing", "expired", "fail"}:
             failures.append(f"blocker unexpectedly satisfied or absent: {blocker}")
+    action_rows = actions.get("actions", [])
+    required_action_fields = {
+        "order", "id", "title", "owner", "status", "evidence", "expiry", "blocker"
+    }
+    if actions.get("release") != manifest["version"] or actions.get("verdict") != "BLOCKED":
+        failures.append("operator actions release identity or verdict mismatch")
+    if len(action_rows) != 7 or [row.get("order") for row in action_rows] != list(range(1, 8)):
+        failures.append("operator actions must be the ordered seven-step plan")
+    for row in action_rows:
+        if not required_action_fields.issubset(row) or row.get("status") != "PENDING":
+            failures.append("each operator action must be complete and PENDING")
+        if not row.get("evidence") or not row.get("expiry") or not row.get("blocker"):
+            failures.append("operator action evidence, expiry and blocker are required")
 
     report = {
         "version": manifest["version"],

@@ -30,6 +30,12 @@ export async function mount(root: HTMLElement): Promise<void> {
   <button type="button">안전 중지 및 지원 요청</button>
   <p>미분쟁 수익은 계속 지급 대상입니다. 사진만으로 과실·보상 거절을 확정하지 않습니다.</p></section>` : ""}
   <aside aria-live="polite"><strong>안전한 상태 처리</strong><p>오프라인·오류·중복 요청은 자동 송금이나 책임 확정 없이 다시 확인합니다.</p></aside></main>
+  <section aria-labelledby="notification-title"><h2 id="notification-title">알림센터</h2>
+  <p>앱 알림이 기본입니다. 잠금화면에는 주소·정밀위치·라이더 정보·주문내용을 표시하지 않습니다.</p>
+  <label><input type="checkbox" checked disabled> 앱 알림</label>
+  <label><input type="checkbox"> 푸시</label><label><input type="checkbox"> 문자</label><label><input type="checkbox"> 이메일</label>
+  <label>방해금지 시작 <input type="time" value="22:00"></label><label>종료 <input type="time" value="07:00"></label>
+  <p>긴급 안전·법적 필수 알림은 별도로 표시됩니다. 알림 확인 여부는 환불·이의제기 등 권리를 제한하지 않습니다.</p></section>
   <footer>서버 권한 검증이 최종 기준입니다. 토큰·정밀위치·원본 사진은 이 기기에 저장하지 않습니다.</footer>`;
 }
 

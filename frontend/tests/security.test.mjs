@@ -32,3 +32,9 @@ test("rider portal explains incident protection boundaries", () => {
   assert.match(app, /미분쟁 수익은 계속 지급 대상/);
   assert.match(app, /사진만으로 과실·보상 거절을 확정하지 않습니다/);
 });
+
+test("notification center keeps lockscreen payload minimal and rights intact", () => {
+  assert.match(app, /알림센터/);
+  assert.match(app, /잠금화면에는 주소·정밀위치·라이더 정보·주문내용을 표시하지 않습니다/);
+  assert.match(app, /환불·이의제기 등 권리를 제한하지 않습니다/);
+});

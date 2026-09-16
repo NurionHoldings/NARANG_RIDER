@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, replace
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from hashlib import sha256
 from urllib.parse import urlparse
@@ -66,19 +66,11 @@ class EvidenceSubmission:
     approval_roles: frozenset[str] = frozenset()
 
     def canonical_digest(self) -> str:
-        payload = "|".join(
-            (
-                self.evidence_id,
-                self.provider_kind.value,
-                self.provider_identity_ref,
-                self.source_url,
-                self.document_sha256,
-                self.issued_at.isoformat(),
-                self.expires_at.isoformat(),
-                self.environment,
-                self.media_type,
-                self.schema_version,
-            )
+        payload = (
+            f"{self.evidence_id}|{self.provider_kind.value}|"
+            f"{self.provider_identity_ref}|{self.source_url}|{self.document_sha256}|"
+            f"{self.issued_at.isoformat()}|{self.expires_at.isoformat()}|"
+            f"{self.environment}|{self.media_type}|{self.schema_version}"
         )
         return sha256(payload.encode()).hexdigest()
 
@@ -87,7 +79,7 @@ class EvidenceIntake:
     """State machine which treats every upload as untrusted."""
 
     def __init__(self, *, now: datetime | None = None) -> None:
-        self.now = now or datetime.now(timezone.utc)
+        self.now = now or datetime.now(UTC)
         if self.now.tzinfo is None:
             raise ValueError("now must be timezone-aware")
         self._records: dict[str, EvidenceSubmission] = {}

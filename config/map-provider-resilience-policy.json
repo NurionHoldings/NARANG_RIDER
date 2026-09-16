@@ -1,0 +1,26 @@
+{
+  "schema": "narang.map-provider-resilience-policy.v1",
+  "version": "1.0.0",
+  "controls": {
+    "provider_isolated_circuit": true,
+    "daily_hard_quota": true,
+    "protected_reserve": true,
+    "monthly_hard_budget": true,
+    "idempotent_cost_reservation": true,
+    "certified_capability_equivalence_required": true
+  },
+  "failover": {
+    "automatic_external_app_switch": false,
+    "rider_choice_required": true,
+    "motorcycle_unverified_fallback": false,
+    "provider_call_from_planner": false
+  },
+  "fairness": {
+    "automatic_pay_change": false,
+    "rider_penalty": false,
+    "route_deviation_misconduct": false
+  },
+  "synthetic_only": true,
+  "external_gate": "EXT-02_PENDING",
+  "production_status": "BLOCKED"
+}

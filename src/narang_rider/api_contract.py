@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import re
 import uuid
 from collections.abc import Mapping
@@ -29,6 +28,7 @@ from .persistence import (
     UnitOfWorkFactory,
     canonical_payload_digest,
 )
+from .resource_limits import JsonBudget, ResourceLimitExceeded, bounded_json_object
 
 MAX_REQUEST_BYTES = 65_536
 _SAFE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
@@ -187,7 +187,8 @@ class ApiContractHandler:
         if contract.required_capability not in principal.capabilities:
             return self._error(403, ApiErrorCode.AUTHORIZATION_DENIED, correlation_id)
         if not self._rate_limit.allow(principal, route_id):
-            return self._error(429, ApiErrorCode.RATE_LIMITED, correlation_id)
+            response = self._error(429, ApiErrorCode.RATE_LIMITED, correlation_id)
+            return HttpResponse(response.status, {**response.headers, "Retry-After": "1"}, response.body)
         if contract.idempotency_required:
             idempotency_key = request.headers.get("Idempotency-Key", "")
             if not _SAFE_ID.fullmatch(idempotency_key):
@@ -351,10 +352,10 @@ class ApiContractHandler:
         if content_type != "application/json":
             return ApiContractHandler._error(415, ApiErrorCode.INVALID_CONTENT_TYPE, correlation_id)
         try:
-            parsed = json.loads(request.body.decode("utf-8"))
-        except (UnicodeDecodeError, json.JSONDecodeError):
-            return ApiContractHandler._error(400, ApiErrorCode.INVALID_REQUEST, correlation_id)
-        if not isinstance(parsed, dict):
+            parsed = bounded_json_object(
+                request.body, JsonBudget(max_bytes=MAX_REQUEST_BYTES)
+            )
+        except ResourceLimitExceeded:
             return ApiContractHandler._error(400, ApiErrorCode.INVALID_REQUEST, correlation_id)
         return parsed
 

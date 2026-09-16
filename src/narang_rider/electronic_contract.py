@@ -24,6 +24,7 @@ class ContractStage(StrEnum):
     PARTNER_SIGNED = "partner_signed"
     COMPANY_SIGNED = "company_signed"
     EXECUTED = "executed"
+    AUTO_EXECUTED = "auto_executed"
     ARCHIVED = "archived"
     WITHDRAWN = "withdrawn"
     EXPIRED = "expired"
@@ -121,6 +122,121 @@ class ContractParty:
 
 
 @dataclass(frozen=True)
+class ContractMandate:
+    mandate_id: str
+    template_digest: str
+    partner_party_id: str
+    vertical: str
+    onboarding_fee_won: int
+    usage_fee_won: int
+    fee_policy_digest: str
+    eligibility_evidence_digest: str
+    refund_policy_digest: str
+    prepayment_disclosure_receipt_digest: str
+    approved_by: str
+    approved_at: datetime
+    expires_at: datetime
+    delegated_actions: frozenset[str] = frozenset({"PREPARE", "PRESENT", "AUTO_EXECUTE"})
+
+    def __post_init__(self) -> None:
+        if (
+            not self.mandate_id
+            or not self.partner_party_id
+            or not self.vertical
+            or not self.approved_by
+            or not _digest_ok(self.template_digest)
+            or not _digest_ok(self.fee_policy_digest)
+            or not _digest_ok(self.eligibility_evidence_digest)
+            or not _digest_ok(self.refund_policy_digest)
+            or not _digest_ok(self.prepayment_disclosure_receipt_digest)
+            or self.onboarding_fee_won < 0
+            or self.usage_fee_won < 0
+            or self.approved_at.tzinfo is None
+            or not self.approved_at < self.expires_at
+        ):
+            raise ContractRejected("complete bounded operator mandate required")
+        if self.delegated_actions != frozenset({"PREPARE", "PRESENT", "AUTO_EXECUTE"}):
+            raise ContractRejected("exact non-discretionary ARKAON mandate required")
+
+    @property
+    def digest(self) -> str:
+        return canonical_digest(
+            {
+                **self.__dict__,
+                "approved_at": self.approved_at.isoformat(),
+                "expires_at": self.expires_at.isoformat(),
+                "delegated_actions": sorted(self.delegated_actions),
+            }
+        )
+
+
+@dataclass(frozen=True)
+class VerifiedPaymentReceipt:
+    receipt_id: str
+    partner_party_id: str
+    mandate_id: str
+    onboarding_fee_won: int
+    usage_fee_won: int
+    method: str
+    status: str
+    paid_at: datetime
+    provider_endpoint: str
+    provider_receipt_digest: str
+    callback_verified: bool
+    synthetic: bool = True
+
+    def __post_init__(self) -> None:
+        parsed = urlsplit(self.provider_endpoint)
+        if (
+            not self.receipt_id
+            or self.method not in {"BANK_TRANSFER", "CARD"}
+            or self.status != "PAID"
+            or self.onboarding_fee_won < 0
+            or self.usage_fee_won < 0
+            or self.paid_at.tzinfo is None
+            or not _digest_ok(self.provider_receipt_digest)
+            or not self.callback_verified
+        ):
+            raise ContractRejected("verified completed payment receipt required")
+        if parsed.scheme != "https" or not parsed.hostname or not parsed.hostname.endswith(".invalid"):
+            raise ContractRejected("synthetic payment provider required")
+        if not self.synthetic:
+            raise ContractRejected("real payment confirmation is forbidden")
+
+
+@dataclass(frozen=True)
+class RepresentativeVerification:
+    verification_id: str
+    partner_party_id: str
+    registered_representative_subject_hash: str
+    verified_identity_subject_hash: str
+    verified_at: datetime
+    expires_at: datetime
+    provider_endpoint: str
+    provider_receipt_digest: str
+    verified: bool
+    synthetic: bool = True
+
+    def __post_init__(self) -> None:
+        parsed = urlsplit(self.provider_endpoint)
+        if (
+            not self.verification_id
+            or not _digest_ok(self.registered_representative_subject_hash)
+            or not _digest_ok(self.verified_identity_subject_hash)
+            or not _digest_ok(self.provider_receipt_digest)
+            or self.registered_representative_subject_hash != self.verified_identity_subject_hash
+            or self.verified_at.tzinfo is None
+            or not self.verified_at < self.expires_at
+            or not self.verified
+        ):
+            raise ContractRejected("business representative identity match required")
+        if parsed.scheme != "https" or not parsed.hostname or not parsed.hostname.endswith(".invalid"):
+            raise ContractRejected("synthetic identity provider required")
+        if not self.synthetic:
+            raise ContractRejected("real identity data is forbidden")
+
+
+@dataclass(frozen=True)
 class ElectronicContract:
     contract_id: str
     template_id: str
@@ -142,6 +258,9 @@ class ElectronicContract:
     execution_digest: str | None = None
     archive_digest: str | None = None
     supersedes_contract_id: str | None = None
+    mandate_digest: str | None = None
+    payment_receipt_digest: str | None = None
+    representative_verification_digest: str | None = None
     arkaon_signed: bool = False
     real_signature_allowed: bool = False
 
@@ -222,7 +341,7 @@ class ElectronicContractService:
         self._used_nonces: set[str] = set()
         self.audit: list[ContractAuditEvent] = []
 
-    def prepare(
+    def prepare_under_mandate(
         self,
         *,
         contract_id: str,
@@ -232,19 +351,36 @@ class ElectronicContractService:
         variables: dict[str, str],
         created_at: datetime,
         expires_at: datetime,
+        mandate: ContractMandate,
+        payment: VerifiedPaymentReceipt,
         supersedes_contract_id: str | None = None,
     ) -> ElectronicContract:
         if contract_id in self._contracts:
             raise ContractRejected("duplicate contract")
         if not template.effective_at <= created_at < template.expires_at:
             raise ContractRejected("template is not currently valid")
+        if (
+            mandate.template_digest != template.digest
+            or mandate.partner_party_id != partner.party_id
+            or created_at >= mandate.expires_at
+            or payment.partner_party_id != partner.party_id
+            or payment.mandate_id != mandate.mandate_id
+            or payment.onboarding_fee_won != mandate.onboarding_fee_won
+            or payment.usage_fee_won != mandate.usage_fee_won
+            or payment.paid_at > created_at
+        ):
+            raise ContractRejected("mandate and payment prerequisites mismatch")
         if set(variables) != set(template.variable_allowlist):
             raise ContractRejected("exact approved template variables required")
         if any(not key.strip() or not value.strip() for key, value in variables.items()):
             raise ContractRejected("blank contract variable forbidden")
         if supersedes_contract_id is not None:
             prior = self.get(supersedes_contract_id)
-            if prior.stage not in {ContractStage.EXECUTED, ContractStage.ARCHIVED}:
+            if prior.stage not in {
+                ContractStage.EXECUTED,
+                ContractStage.AUTO_EXECUTED,
+                ContractStage.ARCHIVED,
+            }:
                 raise ContractRejected("only executed contract may be superseded")
         ordered_variables = tuple(sorted(variables.items()))
         rendered = tuple(
@@ -275,6 +411,8 @@ class ElectronicContractService:
             expires_at,
             ContractStage.ARKAON_PREPARED,
             supersedes_contract_id=supersedes_contract_id,
+            mandate_digest=mandate.digest,
+            payment_receipt_digest=payment.provider_receipt_digest,
         )
         self._contracts[contract_id] = contract
         self._record(contract, "ARKAON_PREPARED", "ARKAON", "system", created_at, document_digest)
@@ -338,6 +476,63 @@ class ElectronicContractService:
         )
         return self._save(updated, "PARTNER_SIGNED", "PARTNER_SIGNER", envelope.signer_id, now, envelope.provider_receipt_digest)
 
+    def accept_partner_signature_and_auto_execute(
+        self,
+        envelope: SignatureEnvelope,
+        *,
+        mandate: ContractMandate,
+        representative: RepresentativeVerification,
+        now: datetime,
+    ) -> ElectronicContract:
+        contract = self._require(envelope.contract_id, ContractStage.PRESENTED, now)
+        if contract.mandate_digest != mandate.digest or now >= mandate.expires_at:
+            raise ContractRejected("active matching automatic execution mandate required")
+        if (
+            representative.partner_party_id != contract.partner.party_id
+            or not representative.verified_at <= now < representative.expires_at
+            or representative.verified_identity_subject_hash
+            != sha256(contract.partner.authorized_signer_id.encode()).hexdigest()
+        ):
+            raise ContractRejected("verified registered business representative required")
+        self._verify_envelope(envelope, contract, contract.partner, now)
+        signed = replace(
+            contract,
+            stage=ContractStage.PARTNER_SIGNED,
+            partner_signature_digest=envelope.provider_receipt_digest,
+            representative_verification_digest=representative.provider_receipt_digest,
+        )
+        self._save(
+            signed,
+            "PARTNER_SIGNED",
+            "VERIFIED_BUSINESS_REPRESENTATIVE",
+            envelope.signer_id,
+            now,
+            envelope.provider_receipt_digest,
+        )
+        execution_digest = canonical_digest(
+            {
+                "document": signed.document_digest,
+                "partner_signature": signed.partner_signature_digest,
+                "mandate": mandate.digest,
+                "payment": signed.payment_receipt_digest,
+                "representative": signed.representative_verification_digest,
+                "executed_at": now.isoformat(),
+            }
+        )
+        executed = replace(
+            signed,
+            stage=ContractStage.AUTO_EXECUTED,
+            execution_digest=execution_digest,
+        )
+        return self._save(
+            executed,
+            "AUTO_EXECUTED",
+            "PREAPPROVED_POLICY_ENGINE",
+            mandate.mandate_id,
+            now,
+            execution_digest,
+        )
+
     def accept_company_signature(self, envelope: SignatureEnvelope, now: datetime) -> ElectronicContract:
         contract = self._require(envelope.contract_id, ContractStage.PARTNER_SIGNED, now)
         self._verify_envelope(envelope, contract, contract.company, now)
@@ -364,7 +559,9 @@ class ElectronicContractService:
         return self._save(updated, "EXECUTED", "OPERATOR", operator_ref, now, execution_digest)
 
     def archive(self, contract_id: str, archive_digest: str, now: datetime) -> ElectronicContract:
-        contract = self._require(contract_id, ContractStage.EXECUTED, now, allow_expired=True)
+        contract = self.get(contract_id)
+        if contract.stage not in {ContractStage.EXECUTED, ContractStage.AUTO_EXECUTED}:
+            raise ContractRejected("executed contract required")
         if not _digest_ok(archive_digest):
             raise ContractRejected("archive evidence digest required")
         updated = replace(contract, stage=ContractStage.ARCHIVED, archive_digest=archive_digest)
@@ -372,7 +569,12 @@ class ElectronicContractService:
 
     def withdraw(self, contract_id: str, operator_ref: str, reason_digest: str, now: datetime) -> ElectronicContract:
         contract = self.get(contract_id)
-        if contract.stage in {ContractStage.EXECUTED, ContractStage.ARCHIVED, ContractStage.WITHDRAWN}:
+        if contract.stage in {
+            ContractStage.EXECUTED,
+            ContractStage.AUTO_EXECUTED,
+            ContractStage.ARCHIVED,
+            ContractStage.WITHDRAWN,
+        }:
             raise ContractRejected("immutable or already withdrawn contract")
         if not operator_ref.strip() or not _digest_ok(reason_digest):
             raise ContractRejected("operator and withdrawal evidence required")
@@ -383,7 +585,12 @@ class ElectronicContractService:
         contract = self.get(contract_id)
         if now.tzinfo is None or now < contract.expires_at:
             raise ContractRejected("contract not due for expiry")
-        if contract.stage in {ContractStage.EXECUTED, ContractStage.ARCHIVED, ContractStage.WITHDRAWN}:
+        if contract.stage in {
+            ContractStage.EXECUTED,
+            ContractStage.AUTO_EXECUTED,
+            ContractStage.ARCHIVED,
+            ContractStage.WITHDRAWN,
+        }:
             raise ContractRejected("immutable terminal contract")
         updated = replace(contract, stage=ContractStage.EXPIRED)
         return self._save(updated, "EXPIRED", "ARKAON", "expiry-monitor", now, contract.document_digest)
@@ -402,11 +609,15 @@ class ElectronicContractService:
             "company_signature_digest": contract.company_signature_digest,
             "execution_digest": contract.execution_digest,
             "archive_digest": contract.archive_digest,
+            "mandate_digest": contract.mandate_digest,
+            "payment_receipt_digest": contract.payment_receipt_digest,
+            "representative_verification_digest": contract.representative_verification_digest,
             "event_chain_head": events[-1].event_digest if events else None,
             "synthetic_only": True,
             "arkaon_is_contracting_party": False,
             "arkaon_signature_allowed": False,
             "production_execution_allowed": False,
+            "automatic_execution_basis": "PREAPPROVED_OPERATOR_MANDATE",
         }
 
     def get(self, contract_id: str) -> ElectronicContract:

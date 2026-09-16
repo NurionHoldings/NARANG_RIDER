@@ -38,6 +38,16 @@ from .control_plane import (
 from .dispatch import DispatchCandidate, DispatchReceipt, FairDispatchPolicy
 from .evidence import DeliveryEvidenceBundle, EvidenceMethod, EvidenceStage
 from .execution import Assignment, AssignmentStatus, DeliveryExecutionService
+from .incidents import (
+    ArkaonIncidentRecommendation,
+    BranchServiceMode,
+    Incident,
+    IncidentEvent,
+    IncidentOperations,
+    IncidentSeverity,
+    IncidentStatus,
+    IncidentType,
+)
 from .ledger import Ledger, LedgerAccount, LedgerEntry
 from .lifecycle import (
     OfferLease,
@@ -94,6 +104,7 @@ __all__ = [
     "ArkaonCapability",
     "ArkaonDevelopmentCoordinator",
     "ArkaonEvolutionRegistry",
+    "ArkaonIncidentRecommendation",
     "ArkaonProfile",
     "ArkaonRelease",
     "ArkaonRolloutController",
@@ -109,6 +120,7 @@ __all__ = [
     "BranchReadiness",
     "BranchRegistry",
     "BranchScopeAuthorizer",
+    "BranchServiceMode",
     "BranchStatus",
     "BranchType",
     "CandidateStatus",
@@ -128,6 +140,12 @@ __all__ = [
     "EvolutionCandidate",
     "FairDispatchPolicy",
     "ForbiddenAuthority",
+    "Incident",
+    "IncidentEvent",
+    "IncidentOperations",
+    "IncidentSeverity",
+    "IncidentStatus",
+    "IncidentType",
     "InterBranchCorridor",
     "Ledger",
     "LedgerAccount",

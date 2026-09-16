@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-rc.3",
+  "version": "0.1.0-rc.4",
   "evidence": [
     {"id":"ci-269","category":"ci_jobs","digest":"local-ci-green","status":"pass","reference":"github-actions://269"},
     {"id":"migration-contract","category":"migrations","digest":"migration-contract-green","status":"pass","reference":"test://postgres-live"},
@@ -12,6 +12,9 @@
     {"id":"performance-049","category":"performance_resource_hardening","digest":"bounded-resource-contracts","status":"pass","reference":"docs://10-performance-resource-audit"},
     {"id":"fuzz-051","category":"protocol_fuzz_regression","digest":"seed-1312903745","status":"pass","reference":"tests://corpus/protocol_regressions.json"},
     {"id":"supply-chain-052","category":"supply_chain_inventory","digest":"offline-policy-green","status":"pass","reference":"artifact://supply-chain-provenance"},
+    {"id":"coverage-gap-054","category":"critical_coverage_gap_inventory","digest":"b4cced8ae7133184e5031741c3ea37000e35e35dcd0d1f62820f3ccac841f9d2","status":"pass","reference":"audit://coverage-gap-report.json"},
+    {"id":"openapi-055","category":"deterministic_openapi_contract","digest":"b861fba4f7972c59a63ddb1af2608f3f305fa00274d8a3e9361770d42e214bb8","status":"pass","reference":"artifact://openapi-contract"},
+    {"id":"bugbot-054","category":"external_bugbot_review","digest":null,"status":"missing","reference":"usage-limit; independent audit substitute is not external approval"},
     {"id":"partner-api","category":"partner_official_api","digest":null,"status":"missing"},
     {"id":"partner-creds","category":"partner_sandbox_credentials","digest":null,"status":"missing"},
     {"id":"maps","category":"map_provider_sandbox","digest":null,"status":"missing"},

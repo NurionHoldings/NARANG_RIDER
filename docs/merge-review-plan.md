@@ -1,6 +1,6 @@
 # NARANG RIDER 전체 롤업 독립 검토 계획
 
-버전: `0.1.0-rc.3`
+버전: `0.1.0-rc.4`
 성격: **REVIEW ONLY — 운영자 승인 전 병합 금지**
 비교 기준: 초기 `main` `8ea1e56774d9de350b9b8455e58fa98a95f94c14` → #052 source HEAD `1c97366e6c4f6bad75122ad3161c26d1f157f966`
 

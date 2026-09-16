@@ -24,7 +24,7 @@ jobs:
         run: python scripts/verify_release_rollup.py --head "${{ github.event.pull_request.head.sha }}"
       - uses: actions/upload-artifact@v4
         with:
-          name: release-rollup-0.1.0-rc.3
+          name: release-rollup-0.1.0-rc.4
           path: build/release-rollup-report.json
           if-no-files-found: error
           retention-days: 30

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -23,10 +24,10 @@ def main() -> int:
     evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8"))
     failures: list[str] = []
 
-    expected_prs = list(range(1, 53))
+    expected_prs = list(range(1, 56))
     if manifest["included_pull_requests"] != expected_prs:
-        failures.append("included PRs must be the contiguous range 1..52")
-    if manifest["version"] != "0.1.0-rc.3" or manifest["purpose"] != "REVIEW_ONLY":
+        failures.append("included PRs must be the contiguous range 1..55")
+    if manifest["version"] != "0.1.0-rc.4" or manifest["purpose"] != "REVIEW_ONLY":
         failures.append("rollup identity or purpose mismatch")
     if manifest["release_verdict"] != "BLOCKED":
         failures.append("rollup release verdict must remain BLOCKED")
@@ -50,20 +51,31 @@ def main() -> int:
     if merge_commits.returncode or merge_commits.stdout.strip():
         failures.append("rollup history contains merge commits or cannot be inspected")
     commit_count = git("rev-list", "--count", f"{main_commit}..{args.head}")
-    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 52:
-        failures.append("rollup history is unexpectedly short for PRs 1..52")
+    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 55:
+        failures.append("rollup history is unexpectedly short for PRs 1..55")
 
     required_internal = {
         "independent_security_finance_audit",
         "performance_resource_hardening",
         "protocol_fuzz_regression",
         "supply_chain_inventory",
+        "critical_coverage_gap_inventory",
+        "deterministic_openapi_contract",
     }
 
     evidence_by_category = {item["category"]: item["status"] for item in evidence["evidence"]}
     for category in required_internal:
         if evidence_by_category.get(category) != "pass":
             failures.append(f"required internal evidence is not passing: {category}")
+    artifact_hashes = {
+        "critical_coverage_gap_inventory": "audit/coverage-gap-report.json",
+        "deterministic_openapi_contract": "api/openapi.json",
+    }
+    evidence_items = {item["category"]: item for item in evidence["evidence"]}
+    for category, path in artifact_hashes.items():
+        actual = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        if evidence_items[category].get("digest") != actual:
+            failures.append(f"internal evidence digest is stale: {category}")
     for blocker in manifest["blockers"]:
         if evidence_by_category.get(blocker) not in {"missing", "expired", "fail"}:
             failures.append(f"blocker unexpectedly satisfied or absent: {blocker}")

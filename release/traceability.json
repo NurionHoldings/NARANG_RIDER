@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "release": "0.1.0-rc.3",
+  "release": "0.1.0-rc.4",
   "known_refs": [
     "domain:safety", "api:safety", "db:safety", "ui:safety", "test:safety", "threat:safety",
     "domain:rider-net", "api:rider-earnings", "db:ledger", "ui:rider-earnings", "test:pricing", "threat:pay-floor",

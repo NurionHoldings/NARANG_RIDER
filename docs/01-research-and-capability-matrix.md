@@ -75,7 +75,7 @@
 - [S9] OECD, Platform cooperatives and employment, 2023-09-25,
   https://www.oecd.org/content/dam/oecd/en/publications/reports/2023/09/platform-cooperatives-and-employment_8e8a1d61/3eab339f-en.pdf
 - [S10] 정책브리핑, 산재보험 전속성 요건 폐지 설명, 2022-07-25,
-  https://www.korea.kr/news/policyNewsView.do?newsId=148903747
+  https://www.korea.kr/news/policyNewsView.do?newsId=148903968
 - [S11] 기업마당/경북·영주시, 공공배달앱 배달료 지원, 2025-10-17,
   https://www.bizinfo.go.kr/sii/siia/selectSIIA200Detail.do?pblancId=PBLN_000000000115634
 - [S12] NYC DCWP, Uber Eats 등 미지급 정산·복직 합의, 2026-01-30,

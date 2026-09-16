@@ -50,6 +50,7 @@ class SyntheticState:
 
 
 STATE = SyntheticState()
+MAX_SYNTHETIC_BODY_BYTES = 65_536
 
 
 async def app(scope: dict[str, Any], receive: Any, send: Any) -> None:
@@ -58,7 +59,16 @@ async def app(scope: dict[str, Any], receive: Any, send: Any) -> None:
     body = b""
     while True:
         message = await receive()
-        body += message.get("body", b"")
+        chunk = message.get("body", b"")
+        if not isinstance(chunk, bytes) or len(body) + len(chunk) > MAX_SYNTHETIC_BODY_BYTES:
+            result = {"error": "PAYLOAD_TOO_LARGE"}
+            encoded = json.dumps(result, separators=(",", ":")).encode()
+            await send({"type": "http.response.start", "status": 413, "headers": [
+                (b"content-type", b"application/json"), (b"cache-control", b"no-store")
+            ]})
+            await send({"type": "http.response.body", "body": encoded})
+            return
+        body += chunk
         if not message.get("more_body"):
             break
     path = scope.get("path", "")

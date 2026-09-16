@@ -6,12 +6,15 @@ import pytest
 
 from narang_rider.electronic_contract import (
     REQUIRED_CLAUSES,
+    ContractMandate,
     ContractParty,
     ContractRejected,
     ContractStage,
     ContractTemplate,
     ElectronicContractService,
+    RepresentativeVerification,
     SignatureEnvelope,
+    VerifiedPaymentReceipt,
 )
 
 NOW = datetime(2026, 9, 16, tzinfo=UTC)
@@ -37,16 +40,42 @@ def party(party_id: str, signer_id: str):
     return ContractParty(party_id, f"법인-{party_id}", f"registry:{party_id}", signer_id, digest(f"authority:{signer_id}"))
 
 
+def prerequisites(partner, tmpl):
+    mandate = ContractMandate(
+        "mandate-1", tmpl.digest, partner.party_id, "maintenance", 100_000, 20_000,
+        digest("fee-policy"), digest("eligibility"), digest("refund-policy"),
+        digest("prepayment-disclosures"), "operator:fees:1", NOW - timedelta(minutes=1),
+        NOW + timedelta(days=30),
+    )
+    payment = VerifiedPaymentReceipt(
+        "payment-1", partner.party_id, mandate.mandate_id, 100_000, 20_000, "CARD", "PAID",
+        NOW - timedelta(seconds=1), "https://payment.synthetic.invalid/callback",
+        digest("payment-receipt"), True,
+    )
+    subject_hash = sha256(partner.authorized_signer_id.encode()).hexdigest()
+    representative = RepresentativeVerification(
+        "identity-1", partner.party_id, subject_hash, subject_hash,
+        NOW - timedelta(minutes=1), NOW + timedelta(days=1),
+        "https://identity.synthetic.invalid/verify", digest("identity-receipt"), True,
+    )
+    return mandate, payment, representative
+
+
 def prepared(service=None, contract_id="contract-1", supersedes=None):
     service = service or ElectronicContractService()
-    contract = service.prepare(
+    tmpl = template()
+    partner = party("partner", "partner-signer")
+    mandate, payment, _representative = prerequisites(partner, tmpl)
+    contract = service.prepare_under_mandate(
         contract_id=contract_id,
-        template=template(),
+        template=tmpl,
         company=party("company", "company-signer"),
-        partner=party("partner", "partner-signer"),
+        partner=partner,
         variables={"company_name": "나랑라이더 운영법인", "partner_name": "합성 입점사"},
         created_at=NOW,
         expires_at=NOW + timedelta(days=30),
+        mandate=mandate,
+        payment=payment,
         supersedes_contract_id=supersedes,
     )
     return service, contract
@@ -88,10 +117,14 @@ def test_arkaon_prepares_only_exact_approved_template_and_variables():
     assert contract.template_digest == template().digest
     assert not contract.arkaon_signed and not contract.real_signature_allowed
     with pytest.raises(ContractRejected, match="exact"):
-        service.prepare(
-            contract_id="bad", template=template(), company=party("c", "s1"), partner=party("p", "s2"),
+        tmpl = template()
+        bad_partner = party("p", "s2")
+        mandate, payment, _representative = prerequisites(bad_partner, tmpl)
+        service.prepare_under_mandate(
+            contract_id="bad", template=tmpl, company=party("c", "s1"), partner=bad_partner,
             variables={"company_name": "c", "partner_name": "p", "invented": "clause"},
             created_at=NOW, expires_at=NOW + timedelta(days=1),
+            mandate=mandate, payment=payment,
         )
 
 
@@ -127,6 +160,56 @@ def test_partner_and_company_sign_exact_same_document_then_operator_executes():
     assert bundle["arkaon_is_contracting_party"] is False
     assert bundle["arkaon_signature_allowed"] is False
     assert bundle["production_execution_allowed"] is False
+
+
+def test_verified_representative_signature_auto_executes_preapproved_paid_contract():
+    service, contract, _ = approved_and_presented()
+    mandate, _, _ = prerequisites(contract.partner, template())
+    executed = service.accept_partner_signature_and_auto_execute(
+        envelope(contract, "partner", "partner-signer", "partner-auto"),
+        mandate=mandate,
+        representative=prerequisites(contract.partner, template())[2],
+        now=NOW,
+    )
+    assert executed.stage is ContractStage.AUTO_EXECUTED
+    assert service.audit[-1].actor_type == "PREAPPROVED_POLICY_ENGINE"
+    assert service.audit[-1].action == "AUTO_EXECUTED"
+    assert (
+        service.evidence_bundle(contract.contract_id)["automatic_execution_basis"]
+        == "PREAPPROVED_OPERATOR_MANDATE"
+    )
+
+
+def test_payment_amount_and_representative_match_are_hard_prerequisites():
+    service = ElectronicContractService()
+    tmpl = template()
+    company = party("company", "company-signer")
+    partner = party("partner", "partner-signer")
+    mandate, payment, _representative = prerequisites(partner, tmpl)
+    with pytest.raises(ContractRejected, match="prerequisites"):
+        service.prepare_under_mandate(
+            contract_id="bad-payment",
+            template=tmpl,
+            company=company,
+            partner=partner,
+            variables={"company_name": "c", "partner_name": "p"},
+            created_at=NOW,
+            expires_at=NOW + timedelta(days=1),
+            mandate=mandate,
+            payment=VerifiedPaymentReceipt(**{**payment.__dict__, "usage_fee_won": 19_999}),
+        )
+    with pytest.raises(ContractRejected, match="representative"):
+        RepresentativeVerification(
+            "bad",
+            partner.party_id,
+            digest("registered"),
+            digest("other"),
+            NOW,
+            NOW + timedelta(days=1),
+            "https://identity.synthetic.invalid/verify",
+            digest("receipt"),
+            True,
+        )
 
 
 @pytest.mark.parametrize(

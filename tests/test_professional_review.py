@@ -9,6 +9,7 @@ from narang_rider.professional_review import (
     ProfessionalDecision,
     ProfessionalDecisionRegistry,
     ProfessionalReviewRejected,
+    admin_readiness_view,
 )
 
 NOW = datetime(2026, 9, 16, tzinfo=UTC)
@@ -56,6 +57,9 @@ def test_all_independent_disciplines_and_operator_are_required():
     readiness = registry.readiness(acceptance())
     assert readiness.legal_approval is True
     assert readiness.release_status == "BLOCKED"
+    view = admin_readiness_view(readiness)
+    assert view["legal_approval"] is True
+    assert "정부" in view["notice"]
 
 
 def test_partial_disciplines_never_approve():

@@ -1,11 +1,11 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from narang_rider.privacy import *
 
 
-NOW = datetime(2026, 9, 16, tzinfo=timezone.utc)
+NOW = datetime(2026, 9, 16, tzinfo=UTC)
 
 
 def subject(branch="sejong", who="customer-1"):

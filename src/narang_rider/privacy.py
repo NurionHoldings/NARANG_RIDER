@@ -9,10 +9,11 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from enum import StrEnum
-from typing import Iterable, Mapping
+from typing import ClassVar
 
 
 class PrivacyErrorCode(StrEnum):
@@ -80,7 +81,7 @@ class ConsentRecord:
     def active(self) -> bool:
         return self.withdrawn_at is None
 
-    def withdraw(self, *, at: datetime) -> "ConsentRecord":
+    def withdraw(self, *, at: datetime) -> ConsentRecord:
         if self.withdrawn_at is not None:
             return self
         return ConsentRecord(**{**self.__dict__, "withdrawn_at": at})
@@ -223,7 +224,7 @@ class BreachCase:
 class PrivacyLifecycleService:
     """In-memory contract model for a transactional persistence adapter."""
 
-    TRANSITIONS = {
+    TRANSITIONS: ClassVar[dict[RequestState, set[RequestState]]] = {
         RequestState.RECEIVED: {RequestState.IDENTITY_VERIFIED},
         RequestState.IDENTITY_VERIFIED: {RequestState.IN_REVIEW},
         RequestState.IN_REVIEW: {

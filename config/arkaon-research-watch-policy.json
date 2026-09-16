@@ -1,0 +1,12 @@
+{
+  "schema_version": "narang.arkaon-research-watch.v1",
+  "domains": ["DELIVERY", "RIDER", "MOBILITY", "MOTORCYCLE_FINANCE", "USED_MARKET", "INSURANCE_COMPARISON", "ELECTRONIC_CONTRACT"],
+  "flow": ["QUARANTINED", "EVIDENCE_VERIFIED", "ETERNIAN_REVIEW", "IMPROVEMENT_PROPOSED", "OPERATOR_DECISION"],
+  "official_https_only": true,
+  "internet_is_untrusted_input": true,
+  "machine_identifier_collection": false,
+  "automatic_learning": false,
+  "automatic_code_application": false,
+  "automatic_merge": false,
+  "automatic_deployment": false
+}

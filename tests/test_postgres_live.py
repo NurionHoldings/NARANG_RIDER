@@ -34,6 +34,8 @@ SETTLEMENT_UP = Path("migrations/0002_settlement_operations.sql").read_text()
 SETTLEMENT_DOWN = Path("migrations/0002_settlement_operations.down.sql").read_text()
 CONTROL_UP = Path("migrations/0003_control_center.sql").read_text()
 CONTROL_DOWN = Path("migrations/0003_control_center.down.sql").read_text()
+INCIDENT_UP = Path("migrations/0004_rider_incident_support.sql").read_text()
+INCIDENT_DOWN = Path("migrations/0004_rider_incident_support.down.sql").read_text()
 
 
 def connect() -> Any:
@@ -66,12 +68,14 @@ def grant_application_access() -> None:
 @pytest.fixture(autouse=True)
 def fresh_schema() -> None:
     ensure_application_role()
+    migrate(INCIDENT_DOWN)
     migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
     migrate(DOWN)
     migrate(UP)
     migrate(SETTLEMENT_UP)
     migrate(CONTROL_UP)
+    migrate(INCIDENT_UP)
     grant_application_access()
 
 
@@ -106,25 +110,69 @@ def create_order(
 
 
 def test_migration_fresh_down_up_is_repeatable() -> None:
+    migrate(INCIDENT_DOWN)
     migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
     migrate(DOWN)
     migrate(UP)
     migrate(SETTLEMENT_UP)
     migrate(CONTROL_UP)
+    migrate(INCIDENT_UP)
     grant_application_access()
+    migrate(INCIDENT_DOWN)
     migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
     migrate(DOWN)
     migrate(UP)
     migrate(SETTLEMENT_UP)
     migrate(CONTROL_UP)
+    migrate(INCIDENT_UP)
     grant_application_access()
     with connect() as connection:
         versions = connection.execute(
             "SELECT version FROM schema_migrations ORDER BY version"
         ).fetchall()
-    assert versions == [(1,), (2,), (3,)]
+    assert versions == [(1,), (2,), (3,), (4,)]
+
+
+def test_incident_coverage_is_immutable_and_cases_are_branch_isolated() -> None:
+    with psycopg.connect(ADMIN_DSN) as connection:
+        connection.execute(
+            "INSERT INTO control_branches(branch_id,level,service_zone_ids,active) "
+            "VALUES ('sejong','LOCAL','[]'::jsonb,true),('daejeon','LOCAL','[]'::jsonb,true)"
+        )
+        connection.execute(
+            "INSERT INTO rider_coverage_snapshots "
+            "(branch_id,snapshot_id,assignment_id,rider_id,provider_reference,product_reference,captured_at) "
+            "VALUES ('sejong','coverage-1','assignment-1','rider-1','provider/ref','product/ref',clock_timestamp())"
+        )
+        with pytest.raises(psycopg.errors.UniqueViolation):
+            connection.execute(
+                "INSERT INTO rider_coverage_snapshots "
+                "(branch_id,snapshot_id,assignment_id,rider_id,provider_reference,product_reference,captured_at) "
+                "VALUES ('sejong','coverage-forged','assignment-1','rider-1','x/ref','y/ref',clock_timestamp())"
+            )
+        connection.rollback()
+
+    with psycopg.connect(ADMIN_DSN) as connection:
+        connection.execute(
+            "INSERT INTO control_branches(branch_id,level,service_zone_ids,active) "
+            "VALUES ('sejong','LOCAL','[]'::jsonb,true),('daejeon','LOCAL','[]'::jsonb,true)"
+        )
+        connection.execute(
+            "INSERT INTO rider_coverage_snapshots "
+            "(branch_id,snapshot_id,assignment_id,rider_id,provider_reference,product_reference,captured_at) "
+            "VALUES ('sejong','coverage-1','assignment-1','rider-1','provider/ref','product/ref',clock_timestamp())"
+        )
+        connection.execute(
+            "INSERT INTO rider_incident_cases "
+            "(branch_id,case_id,rider_id,assignment_id,kind,state,coarse_zone,narrative_vault_ref,coverage_snapshot_id,idempotency_key,payload_digest) "
+            "VALUES ('sejong','case-1','rider-1','assignment-1','ACCIDENT','REPORTED','zone-2','vault://narrative/1','coverage-1','idem-1','digest')"
+        )
+        connection.commit()
+    with connect() as connection:
+        connection.execute("SELECT set_config('app.branch_id', 'daejeon', true)")
+        assert connection.execute("SELECT case_id FROM rider_incident_cases").fetchall() == []
 
 
 def test_rls_hides_other_branches_and_rejects_cross_branch_insert() -> None:

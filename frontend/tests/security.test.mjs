@@ -25,3 +25,10 @@ test("sensitive rendering has redaction and route guard boundaries", () => {
   assert.match(api, /정밀위치 보호/);
   assert.match(api, /ROUTE_GUARD_DENIED/);
 });
+
+test("rider portal explains incident protection boundaries", () => {
+  assert.match(app, /사고·보험 보호/);
+  assert.match(app, /거절 불이익은 없습니다/);
+  assert.match(app, /미분쟁 수익은 계속 지급 대상/);
+  assert.match(app, /사진만으로 과실·보상 거절을 확정하지 않습니다/);
+});

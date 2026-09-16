@@ -2,6 +2,7 @@
 
 from .dispatch import DispatchCandidate, DispatchReceipt, FairDispatchPolicy
 from .evidence import DeliveryEvidenceBundle, EvidenceMethod, EvidenceStage
+from .execution import Assignment, AssignmentStatus, DeliveryExecutionService
 from .ledger import Ledger, LedgerAccount, LedgerEntry
 from .lifecycle import (
     OfferLease,
@@ -18,7 +19,10 @@ from .money import Money
 from .pricing import DeliveryFacts, MerchantOrderEconomics, PricingPolicy, PublicQuote
 
 __all__ = [
+    "Assignment",
+    "AssignmentStatus",
     "DeliveryEvidenceBundle",
+    "DeliveryExecutionService",
     "DeliveryFacts",
     "DispatchCandidate",
     "DispatchReceipt",

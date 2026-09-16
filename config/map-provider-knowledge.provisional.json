@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "last_reviewed": "2026-09-16",
+  "production_activation": "BLOCKED",
+  "providers": [
+    {
+      "provider_id": "kakao-navi",
+      "state": "provisional",
+      "official_docs": ["https://developers.kakao.com/docs/en/kakaonavi/ios"],
+      "navigation_handoff": true,
+      "motorcycle_route_verified": false,
+      "adapter_certified": false
+    },
+    {
+      "provider_id": "naver-cloud-maps",
+      "state": "provisional",
+      "official_docs": [
+        "https://api.ncloud-docs.com/docs/application-maps-overview",
+        "https://api.ncloud-docs.com/docs/en/application-maps-directions5"
+      ],
+      "navigation_handoff": false,
+      "motorcycle_route_verified": false,
+      "adapter_certified": false
+    },
+    {
+      "provider_id": "tmap",
+      "state": "provisional",
+      "official_docs": [
+        "https://tmapapi.tmapmobility.com/",
+        "https://www.tmapmobility.com/service/corporate/api"
+      ],
+      "navigation_handoff": false,
+      "motorcycle_route_verified": false,
+      "adapter_certified": false
+    }
+  ],
+  "notes": [
+    "No URL scheme, intent parameter, app package, key, or coordinate is accepted from this fixture.",
+    "Certification requires official contract fixtures, human review, regression, canary, and rollback."
+  ]
+}

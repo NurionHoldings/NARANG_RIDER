@@ -1,0 +1,13 @@
+{
+  "captured_at": "2026-09-16T08:21:00Z",
+  "source": "declared GitHub PR inventory; CI verifies fetched git ancestry only",
+  "pull_requests": [
+    {"number":42,"branch":"feat/042-privacy-rights-retention","base":"feat/041-functional-portal-journeys","state":"open","merged":false},
+    {"number":43,"branch":"feat/043-support-dispute-casework","base":"feat/042-privacy-rights-retention","state":"open","merged":false},
+    {"number":44,"branch":"feat/044-release-candidate-readiness","base":"feat/043-support-dispute-casework","state":"open","merged":false}
+  ],
+  "limitations": [
+    "Git refs prove ancestry but cannot prove live PR state without GitHub API.",
+    "Declared state must be refreshed by an authorized GitHub review before merge."
+  ]
+}

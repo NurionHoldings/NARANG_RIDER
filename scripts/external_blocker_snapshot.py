@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.validate_external_blockers import (
+from narang_rider.external_blockers import (
     load_registry,
     registry_digest,
     validate_registry,

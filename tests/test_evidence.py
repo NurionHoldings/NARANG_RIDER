@@ -7,6 +7,7 @@ from narang_rider.evidence import (
     DELIVERY_EVIDENCE_PURPOSE,
     ComplaintDisposition,
     DeliveryEvidenceBundle,
+    DoublePackaging,
     EvidenceMethod,
     EvidenceStage,
     UploadInspection,
@@ -85,10 +86,13 @@ def test_one_time_bound_grant_creates_context_only_append_only_receipt() -> None
     assert receipt.penalty_allowed is False
     assert receipt.reusable_for_ai_or_marketing is False
     assert service.verify_receipt_signature(receipt)
-    notice = service.customer_notice(receipt.evidence_id)
+    notice = service.customer_notice(
+        receipt.evidence_id, masked_photo_asset_id="masked-asset:delivery-preview-1"
+    )
     assert notice.dispute_route == "IN_APP_REALTIME_COMPLAINT"
     assert not hasattr(notice, "rider_id")
     assert not hasattr(notice, "approximate_delivery_zone")
+    assert not hasattr(notice, "file_sha256")
     with pytest.raises(ValueError, match="INVALID_OR_USED"):
         record(service, grant.grant_id, token, inspection=inspection(sha256="b" * 64))
 
@@ -319,3 +323,56 @@ def test_past_or_gallery_customer_complaint_photo_is_rejected() -> None:
             newly_broken_seal=True,
             reported_internal_leak=False,
         )
+
+
+@pytest.mark.parametrize("value", tuple(DoublePackaging))
+def test_merchant_packaging_declaration_is_visible_without_rider_liability(
+    value: DoublePackaging,
+) -> None:
+    service = bundle()
+    high_risk = value is not DoublePackaging.NOT_APPLICABLE
+    result = service.record_merchant_packaging(
+        order_id=f"order-{value.value}",
+        high_risk_liquid_order=high_risk,
+        double_packaging=value,
+        seal_number="seal-789",
+        packed_at=NOW,
+    )
+
+    assert result.visible_to_rider_at_pickup
+    assert result.visible_in_customer_order
+    assert result.rider_liability_inferred is False
+
+
+def test_high_risk_order_requires_true_or_false_double_packaging_declaration() -> None:
+    service = bundle()
+    with pytest.raises(ValueError, match="HIGH_RISK_DOUBLE_PACKAGING"):
+        service.record_merchant_packaging(
+            order_id="high-risk",
+            high_risk_liquid_order=True,
+            double_packaging=DoublePackaging.NOT_APPLICABLE,
+            seal_number="seal",
+            packed_at=NOW,
+        )
+
+
+def test_customer_notice_is_idempotent_private_accessible_and_preserves_rights() -> None:
+    service = bundle()
+    grant, token = issue(service)
+    delivery = record(service, grant.grant_id, token)
+
+    first = service.customer_notice(
+        delivery.evidence_id, masked_photo_asset_id="masked-asset:preview"
+    )
+    second = service.customer_notice(
+        delivery.evidence_id, masked_photo_asset_id="masked-asset:different-retry"
+    )
+
+    assert first == second
+    assert first.guidance_text == "개봉 전 외관 이상이 있으면 먼저 신고해 주세요"
+    assert first.report_button_label == "외관 이상 신고"
+    assert first.report_action == "OPEN_IN_APP_REALTIME_CAPTURE"
+    assert first.accessibility_label
+    assert first.guidance_acknowledgement_waives_rights is False
+    assert not hasattr(first, "rider_id")
+    assert not hasattr(first, "approximate_delivery_zone")

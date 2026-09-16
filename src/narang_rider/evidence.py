@@ -14,6 +14,8 @@ _ALLOWED_MIME = frozenset({"image/jpeg", "image/png", "image/webp"})
 _MAX_IMAGE_BYTES = 10 * 1024 * 1024
 DELIVERY_EVIDENCE_PURPOSE = "DELIVERY_PACKAGE_AT_DESIGNATED_HANDOFF_LOCATION"
 CUSTOMER_COMPLAINT_PURPOSE = "REALTIME_CUSTOMER_DAMAGE_COMPLAINT"
+PRE_OPENING_GUIDANCE = "개봉 전 외관 이상이 있으면 먼저 신고해 주세요"
+REPORT_BUTTON_LABEL = "외관 이상 신고"
 
 
 class EvidenceStage(StrEnum):
@@ -28,6 +30,34 @@ class EvidenceMethod(StrEnum):
     ONE_TIME_DELIVERY_CODE = "ONE_TIME_DELIVERY_CODE"
     PACKAGE_SEAL = "PACKAGE_SEAL"
     CUSTOMER_CONFIRMATION = "CUSTOMER_CONFIRMATION"
+
+
+class DoublePackaging(StrEnum):
+    TRUE = "true"
+    FALSE = "false"
+    NOT_APPLICABLE = "not_applicable"
+
+
+@dataclass(frozen=True)
+class MerchantPackagingEvidence:
+    packaging_evidence_id: str
+    order_id: str
+    high_risk_liquid_order: bool
+    double_packaging: DoublePackaging
+    seal_number: str
+    packed_at: datetime
+    visible_to_rider_at_pickup: bool = True
+    visible_in_customer_order: bool = True
+    rider_liability_inferred: bool = False
+
+    def __post_init__(self) -> None:
+        _require_aware(self.packed_at)
+        if not self.order_id.strip() or not self.seal_number.strip():
+            raise ValueError("PACKAGING_ORDER_AND_SEAL_REQUIRED")
+        if self.high_risk_liquid_order and self.double_packaging is DoublePackaging.NOT_APPLICABLE:
+            raise ValueError("HIGH_RISK_DOUBLE_PACKAGING_DECLARATION_REQUIRED")
+        if self.rider_liability_inferred:
+            raise ValueError("PACKAGING_DECLARATION_CANNOT_INFER_RIDER_LIABILITY")
 
 
 @dataclass(frozen=True)
@@ -166,10 +196,18 @@ class ComplaintReview:
 
 @dataclass(frozen=True)
 class CustomerEvidenceNotice:
+    notice_id: str
+    idempotency_key: str
     evidence_id: str
     received_at: datetime
     exterior_appeared_normal: bool
     seal_appeared_intact: bool
+    masked_photo_asset_id: str
+    guidance_text: str = PRE_OPENING_GUIDANCE
+    report_button_label: str = REPORT_BUTTON_LABEL
+    report_action: str = "OPEN_IN_APP_REALTIME_CAPTURE"
+    accessibility_label: str = "배송 음식 외관 이상을 실시간 촬영하여 신고"
+    guidance_acknowledgement_waives_rights: bool = False
     dispute_route: str = "IN_APP_REALTIME_COMPLAINT"
 
 
@@ -198,6 +236,33 @@ class DeliveryEvidenceBundle:
         self._receipts: dict[str, EvidenceReceipt] = {}
         self._digests: set[str] = set()
         self._access_log: list[EvidenceAccess] = []
+        self._packaging: dict[str, MerchantPackagingEvidence] = {}
+        self._customer_notices: dict[str, CustomerEvidenceNotice] = {}
+
+    def record_merchant_packaging(
+        self,
+        *,
+        order_id: str,
+        high_risk_liquid_order: bool,
+        double_packaging: DoublePackaging,
+        seal_number: str,
+        packed_at: datetime,
+    ) -> MerchantPackagingEvidence:
+        if order_id in self._packaging:
+            raise ValueError("PACKAGING_EVIDENCE_APPEND_ONLY")
+        evidence = MerchantPackagingEvidence(
+            packaging_evidence_id=str(uuid4()),
+            order_id=order_id,
+            high_risk_liquid_order=high_risk_liquid_order,
+            double_packaging=double_packaging,
+            seal_number=seal_number,
+            packed_at=packed_at,
+        )
+        self._packaging[order_id] = evidence
+        return evidence
+
+    def packaging_for_order(self, order_id: str) -> MerchantPackagingEvidence:
+        return self._packaging[order_id]
 
     def issue_grant(
         self,
@@ -368,14 +433,29 @@ class DeliveryEvidenceBundle:
     def receipt(self, evidence_id: str) -> EvidenceReceipt:
         return self._receipts[evidence_id]
 
-    def customer_notice(self, evidence_id: str) -> CustomerEvidenceNotice:
+    def customer_notice(
+        self, evidence_id: str, *, masked_photo_asset_id: str
+    ) -> CustomerEvidenceNotice:
         receipt = self._receipts[evidence_id]
-        return CustomerEvidenceNotice(
+        if receipt.file_sha256 is None or receipt.original_deleted_at is not None:
+            raise ValueError("VERIFIED_MASKED_DELIVERY_PHOTO_REQUIRED")
+        if not masked_photo_asset_id.startswith("masked-asset:"):
+            raise ValueError("MASKED_PHOTO_ASSET_REQUIRED")
+        key = f"delivery-evidence-notice:{evidence_id}"
+        existing = self._customer_notices.get(key)
+        if existing is not None:
+            return existing
+        notice = CustomerEvidenceNotice(
+            notice_id=str(uuid4()),
+            idempotency_key=key,
             evidence_id=receipt.evidence_id,
             received_at=receipt.received_at,
             exterior_appeared_normal=receipt.exterior_appeared_normal,
             seal_appeared_intact=receipt.seal_appeared_intact,
+            masked_photo_asset_id=masked_photo_asset_id,
         )
+        self._customer_notices[key] = notice
+        return notice
 
     def access_log(self) -> tuple[EvidenceAccess, ...]:
         return tuple(self._access_log)

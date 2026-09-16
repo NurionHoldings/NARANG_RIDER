@@ -1,4 +1,6 @@
 BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '60s';
 CREATE TABLE notification_preferences (
  branch_id text NOT NULL REFERENCES control_branches(branch_id), recipient_id text NOT NULL,
  contact_vault_ref text, channels jsonb NOT NULL, purposes jsonb NOT NULL,
@@ -27,6 +29,9 @@ CREATE TABLE notification_audit (
  action text NOT NULL, subject_id text NOT NULL, actor_id text NOT NULL,
  created_at timestamptz NOT NULL DEFAULT clock_timestamp(), PRIMARY KEY(branch_id,sequence)
 );
+CREATE TRIGGER immutable_notification_audit
+BEFORE UPDATE OR DELETE ON notification_audit
+FOR EACH ROW EXECUTE FUNCTION reject_append_only_mutation();
 DO $rls$ DECLARE n text; BEGIN FOREACH n IN ARRAY ARRAY[
  'notification_preferences','notification_outbox','notification_callback_receipts','notification_audit'] LOOP
  EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY',n);

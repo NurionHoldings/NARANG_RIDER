@@ -1,4 +1,6 @@
 BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '60s';
 CREATE TABLE control_branches (
  branch_id text PRIMARY KEY, parent_id text REFERENCES control_branches(branch_id),
  level text NOT NULL CHECK(level IN ('HQ','REGIONAL','LOCAL')),
@@ -25,6 +27,9 @@ CREATE TABLE control_audit_outbox (
  action text NOT NULL, subject_id text NOT NULL, actor_id text NOT NULL,
  created_at timestamptz NOT NULL DEFAULT clock_timestamp(), PRIMARY KEY(branch_id,sequence)
 );
+CREATE TRIGGER immutable_control_audit_outbox
+BEFORE UPDATE OR DELETE ON control_audit_outbox
+FOR EACH ROW EXECUTE FUNCTION reject_append_only_mutation();
 DO $rls$ DECLARE n text; BEGIN FOREACH n IN ARRAY ARRAY[
  'control_policies','control_commands','control_audit_outbox'] LOOP
  EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY',n);

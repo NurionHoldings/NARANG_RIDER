@@ -143,6 +143,47 @@ def test_migration_fresh_down_up_is_repeatable() -> None:
     assert versions == [(1,), (2,), (3,), (4,), (5,)]
 
 
+def test_migrations_preserve_forced_rls_grants_valid_indexes_and_audit_immutability() -> None:
+    protected = (
+        "orders", "ledger_entries", "audit_receipts", "control_audit_outbox",
+        "rider_incident_audit", "notification_audit",
+    )
+    with psycopg.connect(ADMIN_DSN) as connection:
+        flags = connection.execute(
+            "SELECT relname, relrowsecurity, relforcerowsecurity FROM pg_class "
+            "WHERE relname = ANY(%s) ORDER BY relname", (list(protected),)
+        ).fetchall()
+        assert len(flags) == len(protected)
+        assert all(enabled and forced for _, enabled, forced in flags)
+        assert connection.execute(
+            "SELECT bool_and(indisvalid) FROM pg_index i JOIN pg_class c ON c.oid=i.indrelid "
+            "WHERE c.relnamespace='public'::regnamespace"
+        ).fetchone() == (True,)
+        assert connection.execute(
+            "SELECT has_table_privilege('narang_app', 'orders', 'SELECT')"
+        ).fetchone() == (True,)
+        connection.execute(
+            "INSERT INTO control_branches(branch_id,level,service_zone_ids,active) "
+            "VALUES ('audit-branch','LOCAL','[]'::jsonb,true)"
+        )
+        connection.execute(
+            "INSERT INTO control_audit_outbox(branch_id,action,subject_id,actor_id) "
+            "VALUES ('audit-branch','SYNTHETIC','subject','actor')"
+        )
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            connection.execute("DELETE FROM control_audit_outbox WHERE branch_id='audit-branch'")
+
+
+def test_mid_migration_failure_is_atomic_and_restart_uses_committed_version() -> None:
+    with psycopg.connect(ADMIN_DSN) as connection:
+        with pytest.raises(psycopg.errors.DivisionByZero), connection.transaction():
+            connection.execute("CREATE TABLE synthetic_migration_probe(id integer)")
+            connection.execute("SELECT 1 / 0")
+        connection.rollback()
+        assert connection.execute("SELECT to_regclass('synthetic_migration_probe')").fetchone() == (None,)
+        assert connection.execute("SELECT max(version) FROM schema_migrations").fetchone() == (5,)
+
+
 def test_notification_outbox_rls_idempotency_and_rights_guard() -> None:
     with psycopg.connect(ADMIN_DSN) as connection:
         connection.execute(

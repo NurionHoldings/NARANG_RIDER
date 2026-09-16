@@ -2,6 +2,8 @@
 -- Application transactions must execute: SET LOCAL app.branch_id = $1.
 
 BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '60s';
 
 CREATE TABLE schema_migrations (
     version integer PRIMARY KEY,

@@ -66,8 +66,12 @@ class SimulationProfile:
             <= 0
         ):
             raise ValueError("SIMULATION_PROFILE_MUST_BE_POSITIVE")
-        if self.orders > 1_000_000:
+        if self.orders > 300_000:
             raise ValueError("SIMULATION_ORDER_LIMIT_EXCEEDED")
+        if self.branches > 1_000 or self.concurrency > 5_000:
+            raise ValueError("SIMULATION_DIMENSION_LIMIT_EXCEEDED")
+        if self.merchants_per_branch > 10_000 or self.riders_per_branch > 10_000:
+            raise ValueError("SIMULATION_POPULATION_LIMIT_EXCEEDED")
 
 
 SMOKE_PROFILE = SimulationProfile("ci_smoke", 3701, 8, 12, 20, 800, 32)

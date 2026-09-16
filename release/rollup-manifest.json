@@ -1,10 +1,10 @@
 {
-  "schema_version": "1.0",
-  "version": "0.1.0-rc.6",
+  "schema_version": "1.3",
+  "version": "0.1.0-rc.10",
   "purpose": "REVIEW_ONLY",
-  "source_branch": "feat/061-professional-review-packet",
-  "source_head": "385351fadfd6fdfb57eeb5f42d940df8d1cf3a5e",
-  "rollup_branch": "feat/062-review-rollup-rc6",
+  "source_branch": "feat/076-map-integrated-release-gate",
+  "source_head": "6abec6dce5626a7940f3e351d61cc27bf8ca6f65",
+  "rollup_branch": "feat/077-review-rollup-rc10",
   "target_branch": "main",
   "expected_initial_main_commit": "8ea1e56774d9de350b9b8455e58fa98a95f94c14",
   "included_pull_requests": [
@@ -68,7 +68,19 @@
     58,
     59,
     60,
-    61
+    61,
+    62,
+    63,
+    72,
+    73,
+    75,
+    76,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83
   ],
   "required_checks": [
     "Unit contracts and lint",
@@ -129,5 +141,75 @@
   ],
   "operator_approval_required": true,
   "auto_merge_forbidden": true,
-  "deployment_forbidden": true
+  "deployment_forbidden": true,
+  "feature_pr_mapping": {
+    "063": {
+      "pull_request": 63,
+      "kind": "external_blocker_tracker"
+    },
+    "065": {
+      "pull_request": 72,
+      "kind": "map_integration_capability"
+    },
+    "066": {
+      "pull_request": 73,
+      "kind": "navigation_device_compatibility"
+    },
+    "068": {
+      "pull_request": 75,
+      "kind": "route_choice_safety_cost"
+    },
+    "069": {
+      "pull_request": 76,
+      "kind": "arkaon_map_competency_evaluation"
+    },
+    "071": {
+      "pull_request": 78,
+      "kind": "map_document_change_monitoring"
+    },
+    "072": {
+      "pull_request": 79,
+      "kind": "map_sandbox_contract_testing"
+    },
+    "073": {
+      "pull_request": 80,
+      "kind": "device_certification_evidence_intake"
+    },
+    "074": {
+      "pull_request": 81,
+      "kind": "route_quality_eta_shadow"
+    },
+    "075": {
+      "pull_request": 82,
+      "kind": "map_provider_resilience_budget"
+    },
+    "076": {
+      "pull_request": 83,
+      "kind": "map_integrated_release_gate"
+    }
+  },
+  "excluded_number_explanation": {
+    "71": "prior rc.7 review-only snapshot",
+    "74": "prior rc.8 review-only snapshot",
+    "77": "prior rc.9 review-only snapshot",
+    "64-70": "GitHub issues EXT-01..EXT-07, not pull requests"
+  },
+  "preserved_rollup_snapshots": [
+    47,
+    53,
+    56,
+    59,
+    62,
+    71,
+    74,
+    77
+  ],
+  "map_evidence": {
+    "map_document_monitor_sha256": "37ce6dbd0cb54586d3721c4acb2ccb9639b62dab86d044ffcf84b4ff04fdd225",
+    "map_sandbox_contract_sha256": "4305abea03705598a8d502074c8db3ff0a721e898fc2d9b203ccee17732184ea",
+    "device_certification_evidence_sha256": "53d924c6b9c530be08982d5410c7ea872e5a184a0315a3f60325e3ed8522319b",
+    "route_quality_shadow_sha256": "6a77a545480ecdff89b3c8689c3fd8a8bbbbf3443fd3e090b12ab7eb03d5cf2c",
+    "map_provider_resilience_sha256": "4cda1d63629db389d764c11f9442a5181f3b361069c1cae2ba3edaa723aa3266",
+    "map_release_gate_sha256": "c8aa500fd3ba7f59e50974a9e21616bbdc69994972e240366c2dfbf73c6a89e2"
+  }
 }

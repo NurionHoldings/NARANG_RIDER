@@ -100,7 +100,13 @@ def test_conditional_rejected_and_withdrawn_gate_release():
     assert conditional.readiness(acceptance()).legal_approval is False
 
     rejected = full_registry()
-    rejected.record(decision(Discipline.LOCATION, status=DecisionStatus.REJECTED))
+    rejected.record(
+        decision(
+            Discipline.LOCATION,
+            decision_id="decision-location-rejected",
+            status=DecisionStatus.REJECTED,
+        )
+    )
     assert rejected.readiness(acceptance()).legal_approval is False
 
     withdrawn = full_registry()

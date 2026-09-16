@@ -1,0 +1,32 @@
+{
+  "version": "0.1.0-rc.3",
+  "evidence": [
+    {"id":"ci-269","category":"ci_jobs","digest":"local-ci-green","status":"pass","reference":"github-actions://269"},
+    {"id":"migration-contract","category":"migrations","digest":"migration-contract-green","status":"pass","reference":"test://postgres-live"},
+    {"id":"sbom","category":"sbom","digest":"generated-in-ci","status":"pass","reference":"artifact://release-evidence"},
+    {"id":"synthetic-e2e","category":"synthetic_e2e","digest":"synthetic-only","status":"pass","reference":"artifact://local-full-stack-evidence"},
+    {"id":"pg-live","category":"postgres_live","digest":"postgres-16-green","status":"pass","reference":"test://postgres-live"},
+    {"id":"a11y-contract","category":"accessibility_contract","digest":"dom-contract-only","status":"pass","reference":"test://frontend"},
+    {"id":"capacity","category":"capacity_simulation","digest":"bounded-synthetic","status":"pass","reference":"artifact://synthetic-simulation-report"},
+    {"id":"audit-048","category":"independent_security_finance_audit","digest":"seven-findings-remediated","status":"pass","reference":"docs://09-independent-security-finance-audit"},
+    {"id":"performance-049","category":"performance_resource_hardening","digest":"bounded-resource-contracts","status":"pass","reference":"docs://10-performance-resource-audit"},
+    {"id":"fuzz-051","category":"protocol_fuzz_regression","digest":"seed-1312903745","status":"pass","reference":"tests://corpus/protocol_regressions.json"},
+    {"id":"supply-chain-052","category":"supply_chain_inventory","digest":"offline-policy-green","status":"pass","reference":"artifact://supply-chain-provenance"},
+    {"id":"partner-api","category":"partner_official_api","digest":null,"status":"missing"},
+    {"id":"partner-creds","category":"partner_sandbox_credentials","digest":null,"status":"missing"},
+    {"id":"maps","category":"map_provider_sandbox","digest":null,"status":"missing"},
+    {"id":"notifications","category":"notification_provider_sandbox","digest":null,"status":"missing"},
+    {"id":"insurance","category":"insurance_provider_sandbox","digest":null,"status":"missing"},
+    {"id":"counsel","category":"legal_counsel_approval","digest":null,"status":"missing"},
+    {"id":"privacy-approval","category":"privacy_officer_approval","digest":null,"status":"missing"},
+    {"id":"operator","category":"operator_approval","digest":null,"status":"missing"},
+    {"id":"main","category":"main_merge","digest":null,"status":"missing"},
+    {"id":"infra","category":"production_infrastructure","digest":null,"status":"missing"},
+    {"id":"secrets","category":"production_secret_provisioning","digest":null,"status":"missing"},
+    {"id":"pilot","category":"field_pilot","digest":null,"status":"missing"},
+    {"id":"dependency-hashes","category":"dependency_archive_hashes","digest":null,"status":"missing"},
+    {"id":"immutable-build-inputs","category":"immutable_container_and_action_digests","digest":null,"status":"missing"},
+    {"id":"license-texts","category":"upstream_license_text_archive","digest":null,"status":"missing"},
+    {"id":"license-review","category":"specialist_license_review","digest":null,"status":"missing"}
+  ]
+}

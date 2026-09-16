@@ -119,6 +119,9 @@ jobs:
       - name: ARKAON contract lifecycle synthetic evidence
         run: PYTHONPATH=src python scripts/run_contract_lifecycle_evidence.py
 
+      - name: ARKAON pre-deployment readiness report
+        run: PYTHONPATH=src python scripts/run_predeployment_readiness.py
+
       - name: Upload OpenAPI contract evidence
         uses: actions/upload-artifact@v4
         with:
@@ -137,6 +140,8 @@ jobs:
             build/electronic-contract-evidence.json.sha256
             build/contract-lifecycle-evidence.json
             build/contract-lifecycle-evidence.json.sha256
+            build/arkaon-predeployment-readiness.json
+            build/arkaon-predeployment-readiness.json.sha256
 
       - name: Deterministic model invariant smoke seeds
         run: python tests/model_harness.py --profile smoke

@@ -26,6 +26,7 @@ from .persistence import (
     UnitOfWork,
     _validate_no_raw_pii,
     canonical_payload_digest,
+    validate_ledger_payload,
 )
 
 
@@ -170,8 +171,20 @@ class PostgresPersistence:
                 """WITH candidates AS (
                     SELECT branch_id, record_id FROM outbox_messages
                     WHERE branch_id = %s AND delivered_at IS NULL
+                      AND dead_lettered_at IS NULL
                       AND available_at <= clock_timestamp()
                       AND (lease_until IS NULL OR lease_until < clock_timestamp())
+                      AND NOT EXISTS (
+                          SELECT 1 FROM outbox_messages AS prior
+                          WHERE prior.branch_id = outbox_messages.branch_id
+                            AND prior.payload ->> 'partner_id' =
+                                outbox_messages.payload ->> 'partner_id'
+                            AND prior.payload ->> 'stream_id' =
+                                outbox_messages.payload ->> 'stream_id'
+                            AND (prior.payload ->> 'sequence')::bigint <
+                                (outbox_messages.payload ->> 'sequence')::bigint
+                            AND prior.delivered_at IS NULL
+                      )
                     ORDER BY available_at, created_at
                     FOR UPDATE SKIP LOCKED LIMIT %s
                 )
@@ -226,6 +239,8 @@ class _PostgresUnitOfWork:
         if not record_id or expected_version is not None and expected_version < 0:
             raise ValueError("valid record id and expected version are required")
         normalized, _ = _json_object(payload)
+        if kind is RecordKind.LEDGER_TRANSACTION:
+            validate_ledger_payload(normalized)
         if normalized.get("branch_id", self._branch_id) != self._branch_id:
             raise TenantScopeError("cross-branch write denied")
         if any(write.kind == kind and write.record_id == record_id for write in self._writes):
@@ -355,8 +370,7 @@ class _PostgresUnitOfWork:
 
     def _write_ledger_entries(self, cursor: Cursor, write: _Write) -> None:
         entries = write.payload.get("entries", [])
-        if not isinstance(entries, list):
-            raise SerializationRejected("ledger entries must be a list")
+        validate_ledger_payload(write.payload)
         for sequence, entry in enumerate(entries):
             if not isinstance(entry, dict):
                 raise SerializationRejected("ledger entry must be an object")

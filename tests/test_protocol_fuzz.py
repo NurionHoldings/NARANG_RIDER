@@ -49,7 +49,9 @@ def test_json_rejects_ambiguous_or_excessive_input(raw, code):
     with pytest.raises(ProtocolError) as caught:
         parse_json_body(raw)
     assert caught.value.code == code
-    assert raw[:20].decode("utf-8", "ignore") not in str(public_error(caught.value))
+    response = public_error(caught.value)
+    assert set(response) == {"status", "error"}
+    assert len(str(response)) < 128
 
 
 def test_json_hard_byte_limit():

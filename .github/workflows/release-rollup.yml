@@ -1,0 +1,30 @@
+name: Release rollup evidence
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  rollup-integrity:
+    name: Release rollup integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify ancestry, contiguous PR inventory and blockers
+        run: python scripts/verify_release_rollup.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-rollup-0.1.0-rc.2
+          path: build/release-rollup-report.json
+          if-no-files-found: error
+          retention-days: 30

@@ -92,7 +92,7 @@ def test_rls_hides_other_branches_and_rejects_cross_branch_insert() -> None:
 
     assert adapter.get(RecordKind.ORDER, "daejeon", "order-1") is None
     with connect() as connection:
-        connection.execute("SET LOCAL app.branch_id = %s", ("daejeon",))
+        connection.execute("SELECT set_config('app.branch_id', %s, true)", ("daejeon",))
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             connection.execute(
                 "INSERT INTO orders (branch_id, record_id, payload, version) "
@@ -121,7 +121,7 @@ def test_composite_fk_and_branch_scoped_source_uniqueness_are_enforced() -> None
         )
 
     with connect() as connection:
-        connection.execute("SET LOCAL app.branch_id = %s", ("daejeon",))
+        connection.execute("SELECT set_config('app.branch_id', %s, true)", ("daejeon",))
         with pytest.raises(psycopg.errors.ForeignKeyViolation):
             connection.execute(
                 "INSERT INTO rider_calls "
@@ -254,7 +254,7 @@ def test_ledger_outbox_and_audit_receipt_roll_back_together() -> None:
         unit.commit()
 
     with connect() as connection:
-        connection.execute("SET LOCAL app.branch_id = %s", ("sejong",))
+        connection.execute("SELECT set_config('app.branch_id', %s, true)", ("sejong",))
         counts = [
             connection.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
             for table in (

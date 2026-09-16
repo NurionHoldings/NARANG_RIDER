@@ -1,0 +1,25 @@
+{
+  "schema": "narang.route-quality-shadow-policy.v1",
+  "version": "1.0.0",
+  "data_boundary": {
+    "synthetic_only": true,
+    "raw_location": false,
+    "rider_or_order_identity": false,
+    "provider_and_cohort_mixing": false,
+    "motorcycle_verification_required": true
+  },
+  "thresholds": {
+    "minimum_samples": 5,
+    "eta_mape_bps_max": 2000,
+    "distance_mape_bps_max": 1500,
+    "eta_p90_error_seconds_max": 300,
+    "baseline_regression_bps_max": 500
+  },
+  "allowed_route_classes": ["urban", "suburban", "rural"],
+  "dispatch_decision": false,
+  "pay_change": false,
+  "rider_penalty": false,
+  "automatic_runtime_activation": false,
+  "external_gate": "EXT-02_PENDING",
+  "production_status": "BLOCKED"
+}

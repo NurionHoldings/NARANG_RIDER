@@ -26,10 +26,10 @@ def main() -> int:
     actions = json.loads(Path(args.actions).read_text(encoding="utf-8"))
     failures: list[str] = []
 
-    expected_prs = list(range(1, 62))
+    expected_prs = [*range(1, 64), 72, 73]
     if manifest["included_pull_requests"] != expected_prs:
-        failures.append("included PRs must be the contiguous range 1..61")
-    if manifest["version"] != "0.1.0-rc.6" or manifest["purpose"] != "REVIEW_ONLY":
+        failures.append("included PRs must be 1..63 plus feature PRs 72 and 73")
+    if manifest["version"] != "0.1.0-rc.8" or manifest["purpose"] != "REVIEW_ONLY":
         failures.append("rollup identity or purpose mismatch")
     if manifest["release_verdict"] != "BLOCKED":
         failures.append("rollup release verdict must remain BLOCKED")
@@ -53,8 +53,16 @@ def main() -> int:
     if merge_commits.returncode or merge_commits.stdout.strip():
         failures.append("rollup history contains merge commits or cannot be inspected")
     commit_count = git("rev-list", "--count", f"{main_commit}..{args.head}")
-    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 61:
-        failures.append("rollup history is unexpectedly short for PRs 1..61")
+    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 63:
+        failures.append("rollup history is unexpectedly short for source through #063")
+
+    mapping = manifest.get("feature_pr_mapping", {})
+    if mapping.get("065", {}).get("pull_request") != 72:
+        failures.append("feature #065 must map to GitHub PR #72")
+    if mapping.get("066", {}).get("pull_request") != 73:
+        failures.append("feature #066 must map to GitHub PR #73")
+    if manifest.get("external_blocker_issue", {}).get("issue") != 65:
+        failures.append("map device and official-scheme blockers must remain tied to EXT-02 issue #65")
 
     required_internal = {
         "independent_security_finance_audit",
@@ -67,6 +75,8 @@ def main() -> int:
         "migration_recovery_drill",
         "external_provider_intake_packet",
         "professional_review_packet",
+        "map_knowledge_contract",
+        "mobile_navigation_synthetic_matrix",
     }
 
     evidence_by_category = {item["category"]: item["status"] for item in evidence["evidence"]}
@@ -80,6 +90,8 @@ def main() -> int:
         "migration_recovery_drill": "build/migration-recovery-drill.json",
         "external_provider_intake_packet": "docs/28-external-provider-sandbox-intake.md",
         "professional_review_packet": "docs/29-professional-independent-review-packet.md",
+        "map_knowledge_contract": "src/narang_rider/map_integration.py",
+        "mobile_navigation_synthetic_matrix": "src/narang_rider/mobile_navigation.py",
     }
     evidence_items = {item["category"]: item for item in evidence["evidence"]}
     for category, path in artifact_hashes.items():

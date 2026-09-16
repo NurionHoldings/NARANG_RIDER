@@ -61,7 +61,11 @@ def main() -> int:
         failures.append("feature #065 must map to GitHub PR #72")
     if mapping.get("066", {}).get("pull_request") != 73:
         failures.append("feature #066 must map to GitHub PR #73")
-    if mapping.get("068", {}).get("pull_request") != 75:\n        failures.append("feature #068 must map to GitHub PR #75")\n    if mapping.get("069", {}).get("pull_request") != 76:\n        failures.append("feature #069 must map to GitHub PR #76")\n    if manifest.get("external_blocker_issue", {}).get("issue") != 65:
+    if mapping.get("068", {}).get("pull_request") != 75:
+        failures.append("feature #068 must map to GitHub PR #75")
+    if mapping.get("069", {}).get("pull_request") != 76:
+        failures.append("feature #069 must map to GitHub PR #76")
+    if manifest.get("external_blocker_issue", {}).get("issue") != 65:
         failures.append("map device and official-scheme blockers must remain tied to EXT-02 issue #65")
 
     required_internal = {

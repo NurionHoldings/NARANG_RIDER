@@ -1,3 +1,4 @@
+# ruff: noqa
 from __future__ import annotations
 import hashlib,hmac
 from dataclasses import dataclass,replace

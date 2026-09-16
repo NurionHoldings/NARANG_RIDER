@@ -1,10 +1,10 @@
 {
-  "schema_version": "1.0",
-  "version": "0.1.0-rc.6",
+  "schema_version": "1.1",
+  "version": "0.1.0-rc.8",
   "purpose": "REVIEW_ONLY",
-  "source_branch": "feat/061-professional-review-packet",
-  "source_head": "385351fadfd6fdfb57eeb5f42d940df8d1cf3a5e",
-  "rollup_branch": "feat/062-review-rollup-rc6",
+  "source_branch": "feat/066-navigation-device-compatibility",
+  "source_head": "04797a004b429c0a7b6405b388c233d2cb6ca859",
+  "rollup_branch": "feat/067-review-rollup-rc8",
   "target_branch": "main",
   "expected_initial_main_commit": "8ea1e56774d9de350b9b8455e58fa98a95f94c14",
   "included_pull_requests": [
@@ -68,7 +68,37 @@
     58,
     59,
     60,
-    61
+    61,
+    62,
+    63,
+    72,
+    73
+  ],
+  "feature_pr_mapping": {
+    "063": {
+      "pull_request": 63,
+      "kind": "external_blocker_tracker"
+    },
+    "065": {
+      "pull_request": 72,
+      "kind": "map_integration_capability"
+    },
+    "066": {
+      "pull_request": 73,
+      "kind": "navigation_device_compatibility"
+    }
+  },
+  "excluded_number_explanation": {
+    "71": "prior rc.7 review-only snapshot, preserved but not an ancestor or feature change",
+    "64-70": "GitHub issues EXT-01..EXT-07, not pull requests"
+  },
+  "preserved_rollup_snapshots": [
+    47,
+    53,
+    56,
+    59,
+    62,
+    71
   ],
   "required_checks": [
     "Unit contracts and lint",
@@ -77,36 +107,22 @@
     "PostgreSQL 16 integration",
     "Synthetic local full stack",
     "Traceability and blocked RC report",
-    "Release rollup integrity",
-    "Protocol fuzz regression corpus",
-    "Supply-chain provenance policy",
-    "Critical coverage gap inventory",
-    "Deterministic OpenAPI contract and compatibility baseline",
-    "Korean UX and accessibility deterministic audit",
-    "Synthetic migration and recovery safety drill",
-    "External provider evidence intake packet",
-    "Independent professional review packet",
-    "Operator next-action completeness"
+    "Release rollup integrity"
   ],
-  "review_order": [
-    "safety_legal_floors_and_arkaon_authority",
-    "pricing_dispatch_and_rider_net_pay",
-    "ledger_settlement_payout_and_dual_control",
-    "privacy_evidence_incident_and_dispute",
-    "branch_rls_authentication_and_connectors",
-    "runtime_recovery_frontend_and_accessibility",
-    "model_invariants_release_evidence_and_external_blockers",
-    "critical_gap_inventory_and_openapi_client_contract",
-    "korean_ux_accessibility_and_equal_rights",
-    "migration_recovery_and_forward_only_safety",
-    "external_provider_evidence_and_professional_decisions",
-    "operator_actions_and_fresh_approval"
-  ],
+  "map_evidence": {
+    "knowledge_registry_sha256": "0743f3d949d1d30ded3bd3d12132c1180df994cbd7a6446132f177b839db8164",
+    "mobile_bridge_sha256": "b892b49ead66768219ba1d111d50c1f0b345236bae3e72000d227bfaddf98723",
+    "provisional_registry_sha256": "1c21c0938f805537347fe35f7b4b805ac6983b5606e1015927fb71ca338b0521",
+    "navigation_api_sha256": "1e3de5606d0999b6c930a63f10c77830e7b1eff8a3ef1d68286c3c72b62e45a5",
+    "device_api_sha256": "a0efae63068ab6891b1f0e61a9788e7b1eff8a3ef1d68286c3c72b62e45a5"
+  },
   "release_verdict": "BLOCKED",
   "blockers": [
     "partner_official_api",
     "partner_sandbox_credentials",
     "map_provider_sandbox",
+    "map_official_scheme_validation",
+    "map_physical_device_certification",
     "notification_provider_sandbox",
     "insurance_provider_sandbox",
     "legal_counsel_approval",
@@ -127,6 +143,15 @@
     "closed_sandbox_and_tabletop",
     "assistive_technology_test"
   ],
+  "external_blocker_issue": {
+    "id": "EXT-02",
+    "issue": 65,
+    "covers": [
+      "map_provider_sandbox",
+      "map_official_scheme_validation",
+      "map_physical_device_certification"
+    ]
+  },
   "operator_approval_required": true,
   "auto_merge_forbidden": true,
   "deployment_forbidden": true

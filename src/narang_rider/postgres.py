@@ -99,8 +99,8 @@ def _json_object(payload: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
 
 def _translate_database_error(error: Exception) -> PersistenceError:
     code = getattr(error, "sqlstate", None) or getattr(error, "pgcode", None)
-    if code == "23505":
-        return ConcurrencyConflict("unique storage constraint rejected the write")
+    if code in {"23503", "23505"}:
+        return ConcurrencyConflict("storage constraint rejected the write")
     if code == "40001":
         return ConcurrencyConflict("database serialization conflict")
     if code == "42501":

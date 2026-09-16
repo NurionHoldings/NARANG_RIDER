@@ -137,7 +137,9 @@
     "electronic_finance_professional_approval",
     "location_professional_approval",
     "closed_sandbox_and_tabletop",
-    "assistive_technology_test"
+    "assistive_technology_test",
+    "map_official_scheme_validation",
+    "map_physical_device_certification"
   ],
   "operator_approval_required": true,
   "auto_merge_forbidden": true,
@@ -211,5 +213,17 @@
     "route_quality_shadow_sha256": "6a77a545480ecdff89b3c8689c3fd8a8bbbbf3443fd3e090b12ab7eb03d5cf2c",
     "map_provider_resilience_sha256": "4cda1d63629db389d764c11f9442a5181f3b361069c1cae2ba3edaa723aa3266",
     "map_release_gate_sha256": "c8aa500fd3ba7f59e50974a9e21616bbdc69994972e240366c2dfbf73c6a89e2"
+  },
+  "external_blocker_issue": {
+    "id": "EXT-02",
+    "issue": 65,
+    "status": "PENDING",
+    "covers": [
+      "map_provider_sandbox",
+      "map_official_scheme_validation",
+      "map_physical_device_certification",
+      "route_provider_capability_evidence",
+      "motorcycle_legality_evidence"
+    ]
   }
 }

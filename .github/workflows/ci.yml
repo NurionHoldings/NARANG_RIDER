@@ -88,6 +88,9 @@ jobs:
       - name: Python compile, source shape and import-cycle contracts
         run: python scripts/check_python_quality.py
 
+      - name: Operational handoff reference freshness
+        run: PYTHONPATH=src python scripts/verify_handoff_refs.py
+
       - name: Tests
         run: pytest -q
 

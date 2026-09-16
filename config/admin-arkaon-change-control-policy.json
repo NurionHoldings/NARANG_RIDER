@@ -1,0 +1,14 @@
+{
+  "schema_version": "narang.admin-arkaon-change-control.v1",
+  "environment": "SYNTHETIC_REVIEW_BRANCH_ONLY",
+  "conversation_actors": ["OPERATOR", "ARKAON"],
+  "allowed_change_prefixes": ["src/", "tests/", "docs/", "config/", "frontend/", ".github/"],
+  "forbidden_targets": [".env", "secrets/", "credentials/", ".git/", "PRODUCTION"],
+  "stages": ["PROPOSED", "PREVIEWED", "OPERATOR_APPROVED", "REVIEW_BRANCH_APPLIED"],
+  "guidance_refresh_required_after": ["PROPOSED", "PREVIEWED", "OPERATOR_APPROVED", "REVIEW_BRANCH_APPLIED"],
+  "operator_approval_required": true,
+  "arkaon_self_approval": false,
+  "automatic_merge": false,
+  "automatic_deployment": false,
+  "production_mutation": false
+}

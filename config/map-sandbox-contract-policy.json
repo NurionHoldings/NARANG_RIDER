@@ -1,0 +1,26 @@
+{
+  "schema": "narang.map-sandbox-contract-policy.v1",
+  "version": "1.0.0",
+  "execution": {
+    "synthetic_only": true,
+    "reserved_host_suffix": ".invalid",
+    "network_access": false,
+    "production_credentials": false,
+    "real_location_data": false
+  },
+  "contract_gates": [
+    "capability_allowlist",
+    "endpoint_allowlist",
+    "request_field_allowlist",
+    "response_schema",
+    "quota_budget",
+    "timeout",
+    "key_revocation",
+    "malformed_response",
+    "pii_non_disclosure"
+  ],
+  "external_gate": "EXT-02_PENDING",
+  "automatic_provider_certification": false,
+  "automatic_runtime_activation": false,
+  "production_status": "BLOCKED"
+}

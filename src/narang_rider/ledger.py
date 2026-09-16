@@ -38,7 +38,12 @@ class LedgerTransaction:
     entries: tuple[LedgerEntry, ...]
 
     def __post_init__(self) -> None:
-        if not self.transaction_id.strip() or not self.order_id.strip() or not self.entries:
+        if (
+            not self.transaction_id.strip()
+            or not self.order_id.strip()
+            or not self.quote_policy_id.strip()
+            or not self.entries
+        ):
             raise ValueError("LEDGER_TRANSACTION_IDENTITY_REQUIRED")
         debits = sum(entry.debit.won for entry in self.entries)
         credits = sum(entry.credit.won for entry in self.entries)

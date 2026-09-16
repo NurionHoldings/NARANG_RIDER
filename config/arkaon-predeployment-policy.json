@@ -1,0 +1,19 @@
+{
+  "schema_version": "narang.arkaon-predeployment-policy.v1",
+  "source_lineage_head": "a9bc9fcd6fdf87cf17db0daee77459dcf8fc5beb",
+  "base_main": "8ea1e56774d9de350b9b8455e58fa98a95f94c14",
+  "main_merge_required_for_device_analysis": false,
+  "integration_candidate_required": true,
+  "synthetic_only": true,
+  "maximum_automatic_verdict": "READY_FOR_OPERATOR_REVIEW",
+  "release_status": "BLOCKED",
+  "arkaon_allowed": ["INSPECT", "REPORT", "PROPOSE_REMEDIATION", "RETEST"],
+  "arkaon_forbidden": [
+    "WAIVE_CHECK",
+    "DELETE_FAILED_TEST",
+    "SELF_ACCEPT_REMEDIATION",
+    "MERGE",
+    "DEPLOY",
+    "USE_PRODUCTION_CREDENTIALS"
+  ]
+}

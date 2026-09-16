@@ -1,0 +1,25 @@
+{
+  "schema": "narang.mobility-plaza-governance.v1",
+  "version": "1.0.0",
+  "status": "BLOCKED",
+  "environment": "SYNTHETIC_ONLY",
+  "verticals": ["installment_finance", "insurance", "motorcycle", "riding_gear", "maintenance", "rental"],
+  "required_stages": ["draft", "evidence_review", "contract_test", "ethernian_review", "operator_decision", "sandbox_enabled"],
+  "comparison_rules": {
+    "commission_affects_score": false,
+    "sponsorship_affects_score": false,
+    "disclose_commission": true,
+    "disclose_sponsorship": true,
+    "external_contract_only": true
+  },
+  "data_boundary": {
+    "cross_platform_personal_data": false,
+    "dispatch_linkage": false,
+    "raw_credit_or_insurance_data": false,
+    "real_location_or_order_data": false
+  },
+  "arkaon": {
+    "allowed": ["HUMAN_REVIEW", "REQUEST_EVIDENCE", "PROPOSE_SUSPENSION"],
+    "forbidden": ["APPROVE_CREDIT", "PRICE_CREDIT", "UNDERWRITE_INSURANCE", "CONCLUDE_SUITABILITY", "BIND_CONTRACT", "MOVE_MONEY", "AUTO_SANCTION", "AUTO_RANK_BY_COMMISSION", "MERGE_PLATFORM_PERSONAL_DATA", "CONTACT_EXTERNAL_PARTNER", "ACTIVATE_PRODUCTION"]
+  }
+}

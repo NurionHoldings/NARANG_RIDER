@@ -43,3 +43,17 @@ ARKAON은 수요 예측, 공정 배차, 수익 최적화와 운영 지원에 사
 - 도메인 모델과 API 계약
 - 라이더·가맹점·지역허브 MVP
 - 위협 모델과 검증 가능한 테스트
+
+## 구현 현황
+
+`#001 Core Money & Decision Contract` 기능 브랜치에서 다음 기반을 구현합니다.
+
+- 거리·대기·복귀·묶음·안전 가산을 분리한 공개 단가 견적
+- 수락 전 라이더 건당·시간당 예상 순수익
+- 거절이력·보호특성·AI 점수를 차단하는 설명 가능한 FIFO 배차 영수증
+- 점주 부담 상한과 고객·점주·라이더·안전·지역기금을 연결하는 불변 정산 원장
+- one-time 인앱 촬영과 사람심사를 강제하는 개인정보 최소형 배송증거 영수증
+
+근거와 기존 capability 추적표는
+[시장 조사 및 baseline capability matrix](docs/01-research-and-capability-matrix.md), 구현 경계는
+[MVP foundation contract](docs/02-mvp-foundation.md)를 참조합니다.

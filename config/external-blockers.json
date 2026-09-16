@@ -1,0 +1,251 @@
+{
+  "schema_version": "1.0.0",
+  "release_gate": "BLOCKED",
+  "allowed_statuses": [
+    "PENDING",
+    "IN_PROGRESS",
+    "BLOCKED",
+    "VERIFIED"
+  ],
+  "secure_evidence_policy": {
+    "reference_only": true,
+    "allowed_schemes": [
+      "vault-ref",
+      "evidence-ref",
+      "sha256"
+    ],
+    "digest_algorithm": "sha256",
+    "forbid_secrets_and_pii": true,
+    "verified_requires": [
+      "evidence_refs",
+      "evidence_digest",
+      "evidence_generated_at",
+      "evidence_expires_at",
+      "ethernian_review_ref"
+    ],
+    "no_auto_issue_close_release": true
+  },
+  "blockers": [
+    {
+      "id": "EXT-01",
+      "title": "제휴사 공식 API·Sandbox 확보",
+      "owner_role": "PARTNER_INTEGRATION_LEAD",
+      "dependencies": [],
+      "acceptance": [
+        "공식 API 명세의 격리 저장소 참조와 SHA-256 다이제스트",
+        "Sandbox 인증·서명·멱등·순서·키교체 계약시험 통과",
+        "Ethernian 독립 검토 기록",
+        "운영자 승인"
+      ],
+      "prohibited": [
+        "API 키·토큰·비밀번호·인증서 원문",
+        "고객·점주·라이더 개인정보",
+        "출처가 확인되지 않은 캡처만으로 인증"
+      ],
+      "risk": "CRITICAL",
+      "operator_required": true,
+      "sequence": 1,
+      "status": "PENDING",
+      "evidence_refs": [],
+      "evidence_digest": null,
+      "evidence_generated_at": null,
+      "evidence_expires_at": null,
+      "ethernian_review_ref": null,
+      "operator_approval_ref": null,
+      "last_revalidated_at": null
+    },
+    {
+      "id": "EXT-02",
+      "title": "지도·알림·보험 등 공급자 선정과 Sandbox",
+      "owner_role": "SUPPLIER_ASSURANCE_LEAD",
+      "dependencies": [],
+      "acceptance": [
+        "공급자별 데이터 처리·보존·재위탁 범위 기록",
+        "지도·알림·보험·결제·Vault·미디어검사 Sandbox 계약시험 통과",
+        "장애·키교체·철회 시험 증거",
+        "Ethernian 독립 검토 기록",
+        "운영자 승인"
+      ],
+      "prohibited": [
+        "운영 자격증명 원문",
+        "실제 위치·연락처·보험·결제 개인정보",
+        "마케팅 자료만으로 적합 판정"
+      ],
+      "risk": "CRITICAL",
+      "operator_required": true,
+      "sequence": 2,
+      "status": "PENDING",
+      "evidence_refs": [],
+      "evidence_digest": null,
+      "evidence_generated_at": null,
+      "evidence_expires_at": null,
+      "ethernian_review_ref": null,
+      "operator_approval_ref": null,
+      "last_revalidated_at": null
+    },
+    {
+      "id": "EXT-03",
+      "title": "5개 전문분야 독립 검토",
+      "owner_role": "INDEPENDENT_REVIEW_COORDINATOR",
+      "dependencies": [
+        "EXT-01",
+        "EXT-02"
+      ],
+      "acceptance": [
+        "법률·개인정보·노무·보험·회계/전자금융 5개 분야 검토",
+        "각 검토자의 범위·독립성·유효기간 기록",
+        "조건부 의견의 해소 또는 출시 차단 등록",
+        "Ethernian 종합 검토 기록",
+        "운영자 수락"
+      ],
+      "prohibited": [
+        "주민등록번호·건강정보 등 검토에 불필요한 개인정보",
+        "이해상충 또는 자기승인",
+        "법률승인을 코드가 자동 생성한 기록"
+      ],
+      "risk": "CRITICAL",
+      "operator_required": true,
+      "sequence": 3,
+      "status": "PENDING",
+      "evidence_refs": [],
+      "evidence_digest": null,
+      "evidence_generated_at": null,
+      "evidence_expires_at": null,
+      "ethernian_review_ref": null,
+      "operator_approval_ref": null,
+      "last_revalidated_at": null
+    },
+    {
+      "id": "EXT-04",
+      "title": "비운영 인프라·Vault 준비",
+      "owner_role": "PLATFORM_OPERATIONS_LEAD",
+      "dependencies": [
+        "EXT-01",
+        "EXT-02"
+      ],
+      "acceptance": [
+        "운영과 격리된 비운영 환경",
+        "Vault 참조 기반 비밀 주입 및 교체 시험",
+        "최소권한·감사로그·백업복구 검증",
+        "Ethernian 보안 검토 기록",
+        "운영자 승인"
+      ],
+      "prohibited": [
+        "저장소·Issue·로그의 비밀 원문",
+        "실제 고객·점주·라이더 데이터",
+        "운영 결제·송금 실행"
+      ],
+      "risk": "HIGH",
+      "operator_required": true,
+      "sequence": 4,
+      "status": "PENDING",
+      "evidence_refs": [],
+      "evidence_digest": null,
+      "evidence_generated_at": null,
+      "evidence_expires_at": null,
+      "ethernian_review_ref": null,
+      "operator_approval_ref": null,
+      "last_revalidated_at": null
+    },
+    {
+      "id": "EXT-05",
+      "title": "폐쇄 Sandbox·도상훈련·보조기기 시험",
+      "owner_role": "PILOT_ASSURANCE_LEAD",
+      "dependencies": [
+        "EXT-03",
+        "EXT-04"
+      ],
+      "acceptance": [
+        "합성데이터 폐쇄 Sandbox E2E 통과",
+        "안전·정산·개인정보·장애 도상훈련 통과",
+        "실제 보조기기 접근성 시험 결과",
+        "중지·복구·이의제기 절차 검증",
+        "Ethernian 독립 검토 기록"
+      ],
+      "prohibited": [
+        "실제 주문·송금·개인정보",
+        "참여자의 권리 포기 동의",
+        "실패를 숨긴 요약만으로 통과"
+      ],
+      "risk": "HIGH",
+      "operator_required": false,
+      "sequence": 5,
+      "status": "PENDING",
+      "evidence_refs": [],
+      "evidence_digest": null,
+      "evidence_generated_at": null,
+      "evidence_expires_at": null,
+      "ethernian_review_ref": null,
+      "operator_approval_ref": null,
+      "last_revalidated_at": null
+    },
+    {
+      "id": "EXT-06",
+      "title": "제한 지역 현장 파일럿",
+      "owner_role": "FIELD_PILOT_LEAD",
+      "dependencies": [
+        "EXT-05"
+      ],
+      "acceptance": [
+        "명시적 참가 동의·철회·무보복 절차",
+        "만료형 제한 지역·기간·상한 설정",
+        "안전·순수익·점주이익·정산·분쟁 지표 검증",
+        "중지조건·사고대응·독립 이의절차 현장 검증",
+        "Ethernian 독립 검토 기록",
+        "운영자 승인"
+      ],
+      "prohibited": [
+        "전국 자동 확대",
+        "동의하지 않은 개인정보·위치 수집",
+        "AI의 계정정지·보수삭감·보험료·배차배제 결정"
+      ],
+      "risk": "CRITICAL",
+      "operator_required": true,
+      "sequence": 6,
+      "status": "PENDING",
+      "evidence_refs": [],
+      "evidence_digest": null,
+      "evidence_generated_at": null,
+      "evidence_expires_at": null,
+      "ethernian_review_ref": null,
+      "operator_approval_ref": null,
+      "last_revalidated_at": null
+    },
+    {
+      "id": "EXT-07",
+      "title": "최종 Fresh 검토·운영자 출시 승인",
+      "owner_role": "OPERATOR",
+      "dependencies": [
+        "EXT-01",
+        "EXT-02",
+        "EXT-03",
+        "EXT-04",
+        "EXT-05",
+        "EXT-06"
+      ],
+      "acceptance": [
+        "최종 후보 커밋에 대한 Fresh 독립 검토",
+        "모든 선행 차단조건 VERIFIED 및 유효기간 내",
+        "출시·롤백·중지·연락체계 최종 확인",
+        "Ethernian 최종 검토 기록",
+        "운영자 최인석의 명시적 승인"
+      ],
+      "prohibited": [
+        "과거 버전 검토의 재사용만으로 승인",
+        "자동 승인·자동 병합·자동 배포",
+        "미해결 CRITICAL/HIGH 위험 은폐"
+      ],
+      "risk": "CRITICAL",
+      "operator_required": true,
+      "sequence": 7,
+      "status": "PENDING",
+      "evidence_refs": [],
+      "evidence_digest": null,
+      "evidence_generated_at": null,
+      "evidence_expires_at": null,
+      "ethernian_review_ref": null,
+      "operator_approval_ref": null,
+      "last_revalidated_at": null
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+name: Large model invariant verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  model-invariants:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install project
+        run: python -m pip install -e ".[dev]"
+      - name: Run 256 deterministic seeds
+        run: python tests/model_harness.py --profile large
+      - uses: actions/upload-artifact@v4
+        with:
+          name: model-invariant-large-report
+          path: build/model-invariant-report.json
+          if-no-files-found: error
+          retention-days: 30

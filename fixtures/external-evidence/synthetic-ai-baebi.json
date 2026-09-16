@@ -1,0 +1,18 @@
+{
+  "schema_version": "2026-09",
+  "evidence_id": "synthetic-ai-baebi-openapi-001",
+  "provider_kind": "ai_baebi",
+  "provider_identity_ref": "provider-registry://synthetic-ai-baebi",
+  "source_url": "https://developer.example.test/openapi.json",
+  "document_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "issued_at": "2026-09-15T00:00:00+00:00",
+  "expires_at": "2026-12-31T00:00:00+00:00",
+  "environment": "sandbox",
+  "media_type": "application/json",
+  "malware_scan_ref": "malware-scan://synthetic-pass-001",
+  "schema_compatible": true,
+  "contains_embedded_secrets": false,
+  "contains_personal_data": false,
+  "status": "RECEIVED",
+  "release_status": "BLOCKED"
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "narang.map-document-monitor-policy.v1",
+  "version": "1.0.0",
+  "source_policy": {
+    "official_https_only": true,
+    "authority_verification_required": true,
+    "raw_document_retention": false,
+    "content_digest": "sha256",
+    "internet_to_registry_write": false
+  },
+  "sensitive_fields": [
+    "scheme",
+    "host",
+    "path",
+    "query_parameters",
+    "api_key_policy",
+    "data_retention",
+    "subprocessors",
+    "motorcycle_support"
+  ],
+  "transitions": {
+    "unchanged_and_current": "CURRENT",
+    "content_changed": "HUMAN_REVIEW",
+    "sensitive_or_removed_field": "HUMAN_REVIEW",
+    "stale": "STALE",
+    "unverified_or_prompt_injection": "BLOCKED"
+  },
+  "automatic_registry_update": false,
+  "automatic_runtime_activation": false,
+  "automatic_model_learning": false,
+  "production_status": "BLOCKED"
+}

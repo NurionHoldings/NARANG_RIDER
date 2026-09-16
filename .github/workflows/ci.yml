@@ -157,8 +157,7 @@ jobs:
         run: docker compose -f compose.local.yml up --build --wait
       - name: Deterministic end-to-end smoke
         run: |-
-          docker compose -f compose.local.yml exec -T app python scripts/local_full_stack_smoke.py --base-url http://127.0.0.1:8000 --output /tmp/local-full-stack-report.json
-          docker cp narang-rider-local-app-1:/tmp/local-full-stack-report.json ./local-full-stack-report.json
+          docker compose -f compose.local.yml exec -T app python scripts/local_full_stack_smoke.py --base-url http://127.0.0.1:8000 --output /tmp/local-full-stack-report.json | tee local-full-stack-report.json
       - name: Collect redacted synthetic logs
         if: always()
         run: docker compose -f compose.local.yml logs --no-color --no-log-prefix | sed -E 's/(authorization|cookie|token)=[^ ]+/\\1=[REDACTED]/Ig' > local-stack.log

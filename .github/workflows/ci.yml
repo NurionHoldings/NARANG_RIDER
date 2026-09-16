@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Python 3.11 quality
+    name: Unit contracts and lint
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -42,3 +42,40 @@ jobs:
 
       - name: Whitespace errors
         run: git diff --check
+
+  live-postgres:
+    name: PostgreSQL 16 integration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: narang_rider_test
+          POSTGRES_USER: narang_test
+          POSTGRES_PASSWORD: narang_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U narang_test -d narang_rider_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      NARANG_TEST_POSTGRES_DSN: >-
+        postgresql://narang_test:narang_test@127.0.0.1:5432/narang_rider_test
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install project and PostgreSQL test driver
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev,postgres]"
+
+      - name: Run migration and live database proofs
+        run: pytest -q tests/test_postgres_live.py

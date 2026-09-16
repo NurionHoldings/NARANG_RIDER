@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0",
+  "release": "0.1.0-rc.7",
+  "verdict": "BLOCKED",
+  "generated_for": "operator_review_only",
+  "actions": [
+    {
+      "order": 1,
+      "id": "official-partner-sandbox",
+      "title": "공식 제휴 문서와 Sandbox 확보",
+      "owner": "제휴·보안 운영책임자",
+      "status": "PENDING",
+      "evidence": [
+        "공식 URL·조회일·문서 SHA-256",
+        "Sandbox 승인서",
+        "Vault 자격증명 참조"
+      ],
+      "expiry": "공급자 문서 만료일 또는 90일 중 빠른 날",
+      "blocker": "partner_official_api",
+      "issue_number": 64,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/64"
+    },
+    {
+      "order": 2,
+      "id": "provider-selection",
+      "title": "운영 공급자 선정",
+      "owner": "운영자 최인석",
+      "status": "PENDING",
+      "evidence": [
+        "비교평가표",
+        "DPA·SLA·가격·재위탁자 목록",
+        "선정 서명참조"
+      ],
+      "expiry": "가격·계약·재위탁자 변경 시",
+      "blocker": "production_infrastructure",
+      "issue_number": 65,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/65"
+    },
+    {
+      "order": 3,
+      "id": "five-professional-reviews",
+      "title": "5개 분야 독립 전문가 검토 위임",
+      "owner": "운영자 최인석·분야별 전문가",
+      "status": "PENDING",
+      "evidence": [
+        "법률·개인정보",
+        "노무·보험",
+        "회계·세무",
+        "전자금융",
+        "위치 분야별 서명의견 참조"
+      ],
+      "expiry": "시스템·법령·계약 변경 또는 의견 만료 시",
+      "blocker": "legal_counsel_approval",
+      "issue_number": 66,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/66"
+    },
+    {
+      "order": 4,
+      "id": "nonprod-infra-vault",
+      "title": "비운영 인프라와 Vault 구성",
+      "owner": "보안·인프라 책임자",
+      "status": "PENDING",
+      "evidence": [
+        "IaC 검토",
+        "Vault 경로·키교체 시험",
+        "비운영 네트워크·RLS 증거"
+      ],
+      "expiry": "구성·키·이미지 변경 시",
+      "blocker": "production_secret_provisioning",
+      "issue_number": 67,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/67"
+    },
+    {
+      "order": 5,
+      "id": "closed-validation",
+      "title": "폐쇄 Sandbox·도상훈련·보조기기 시험",
+      "owner": "QA·안전·접근성 책임자",
+      "status": "PENDING",
+      "evidence": [
+        "합성 E2E",
+        "SEV/복구 도상훈련",
+        "실제 보조기기 시험 보고서"
+      ],
+      "expiry": "UI·런타임·런북 변경 시",
+      "blocker": "closed_sandbox_and_tabletop",
+      "issue_number": 68,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/68"
+    },
+    {
+      "order": 6,
+      "id": "limited-field-pilot",
+      "title": "제한 지역 현장 파일럿",
+      "owner": "운영자·파일럿 지사 안전책임자",
+      "status": "PENDING",
+      "evidence": [
+        "참가 동의·철회",
+        "중지·재개 기록",
+        "안전·경제성·개인정보 결과"
+      ],
+      "expiry": "파일럿 종료 또는 범위 확대 전",
+      "blocker": "field_pilot",
+      "issue_number": 69,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/69"
+    },
+    {
+      "order": 7,
+      "id": "fresh-review-approval",
+      "title": "최신 버전 재검토와 명시적 승인",
+      "owner": "에테르니언 독립심사·운영자 최인석",
+      "status": "PENDING",
+      "evidence": [
+        "최신 commit·CI·SBOM·증거 digest",
+        "미해결 조건 0건",
+        "서명된 운영자 승인"
+      ],
+      "expiry": "HEAD·의존성·외부 계약 변경 시 즉시",
+      "blocker": "operator_approval",
+      "issue_number": 70,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/70"
+    }
+  ]
+}

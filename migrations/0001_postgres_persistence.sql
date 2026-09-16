@@ -117,6 +117,15 @@ CREATE TABLE outbox_messages (
 
 CREATE INDEX outbox_delivery_idx
     ON outbox_messages (branch_id, available_at, created_at)
+    WHERE delivered_at IS NULL AND dead_lettered_at IS NULL;
+
+CREATE INDEX outbox_stream_order_idx
+    ON outbox_messages (
+        branch_id,
+        (payload ->> 'partner_id'),
+        (payload ->> 'stream_id'),
+        ((payload ->> 'sequence')::bigint)
+    )
     WHERE delivered_at IS NULL;
 
 CREATE TABLE outbox_review_events (

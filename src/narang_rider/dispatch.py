@@ -60,6 +60,7 @@ class FairDispatchPolicy:
     ALLOWED_FEATURES = frozenset(
         {"eligibility", "safety_eligibility", "available_since", "distance_to_pickup"}
     )
+    MAX_CANDIDATES_PER_OFFER = 5_000
 
     def __init__(self, policy_id: str) -> None:
         if not policy_id.strip():
@@ -73,6 +74,8 @@ class FairDispatchPolicy:
         *,
         requested_features: tuple[str, ...] = (),
     ) -> DispatchReceipt:
+        if len(candidates) > self.MAX_CANDIDATES_PER_OFFER:
+            raise ValueError("DISPATCH_CANDIDATE_LIMIT_EXCEEDED")
         features = set(requested_features) or set(self.ALLOWED_FEATURES)
         prohibited = features & PROHIBITED_DECISION_FEATURES
         unknown = features - self.ALLOWED_FEATURES

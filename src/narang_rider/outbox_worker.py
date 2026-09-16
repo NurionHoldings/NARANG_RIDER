@@ -64,7 +64,14 @@ class DeliveryPolicy:
             self.circuit_failure_threshold,
             self.circuit_open_seconds,
         )
-        if any(value < 1 for value in values) or self.batch_size > 500:
+        if (
+            any(value < 1 for value in values)
+            or self.batch_size > 500
+            or self.lease_seconds > 300
+            or self.max_attempts > 20
+            or self.max_backoff_seconds > 3_600
+            or self.circuit_open_seconds > 3_600
+        ):
             raise ValueError("delivery policy values are outside safe bounds")
 
 
@@ -405,6 +412,9 @@ class PostgresOutboxStore:
 
     @staticmethod
     def _scope(cursor: Any, branch_id: str) -> None:
+        cursor.execute("SET LOCAL statement_timeout = '5s'")
+        cursor.execute("SET LOCAL lock_timeout = '1s'")
+        cursor.execute("SET LOCAL idle_in_transaction_session_timeout = '10s'")
         cursor.execute("SELECT set_config('app.branch_id', %s, true)", (branch_id,))
 
     def lease(

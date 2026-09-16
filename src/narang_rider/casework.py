@@ -20,6 +20,7 @@ class CaseErrorCode(StrEnum):
     HUMAN_DECISION_REQUIRED = "CASE_HUMAN_DECISION_REQUIRED"
     DUPLICATE_ACTION = "CASE_DUPLICATE_ACTION"
     SLA_POLICY_VIOLATION = "CASE_SLA_POLICY_VIOLATION"
+    RESOURCE_LIMIT = "CASE_RESOURCE_LIMIT"
 
 
 class CaseRejected(ValueError):
@@ -199,6 +200,9 @@ class ArkaonCaseAdvice:
 
 
 class CaseworkService:
+    MAX_PARTICIPANTS = 16
+    MAX_MESSAGES_PER_CASE = 500
+    MAX_EVIDENCE_PER_CASE = 100
     TRANSITIONS: ClassVar[dict[CaseState, set[CaseState]]] = {
         CaseState.OPEN: {CaseState.TRIAGE},
         CaseState.TRIAGE: {CaseState.ASSIGNED},
@@ -232,7 +236,14 @@ class CaseworkService:
         idempotency_key: str,
         now: datetime,
     ) -> SupportCase:
-        participants = frozenset(participant_ids)
+        participant_values: list[str] = []
+        for participant_id in participant_ids:
+            if len(participant_values) >= self.MAX_PARTICIPANTS:
+                raise CaseRejected(CaseErrorCode.RESOURCE_LIMIT)
+            participant_values.append(participant_id)
+        participants = frozenset(participant_values)
+        if not participants:
+            raise CaseRejected(CaseErrorCode.INVALID_REFERENCE)
         if principal.principal_id not in participants and (
             not principal.representative_for_ref
             or not principal.representative_for_ref.startswith("vault://representative/")
@@ -303,6 +314,8 @@ class CaseworkService:
         self._check_version(case, expected_version)
         if message.author_id != principal.principal_id or message.sequence != len(case.messages) + 1:
             raise CaseRejected(CaseErrorCode.INVALID_REFERENCE)
+        if len(case.messages) >= self.MAX_MESSAGES_PER_CASE:
+            raise CaseRejected(CaseErrorCode.RESOURCE_LIMIT)
         if message.internal and principal.role not in {
             ParticipantRole.SUPPORT,
             ParticipantRole.PRIVACY_OFFICER,
@@ -325,6 +338,8 @@ class CaseworkService:
         self._check_version(case, expected_version)
         if evidence.submitted_by != principal.principal_id:
             raise CaseRejected(CaseErrorCode.INVALID_REFERENCE)
+        if len(case.evidence) >= self.MAX_EVIDENCE_PER_CASE:
+            raise CaseRejected(CaseErrorCode.RESOURCE_LIMIT)
         if not evidence.subject_ids.issubset(case.participant_ids):
             raise CaseRejected(CaseErrorCode.INVALID_REFERENCE)
         if any(item.evidence_id == evidence.evidence_id for item in case.evidence):

@@ -51,3 +51,11 @@ test("operations labels synthetic simulation as non-production evidence", () => 
   assert.match(app, /합성 검증 보고서/);
   assert.match(app, /실데이터가 아닌 부하·경제성·악용 가설/);
 });
+
+test("pilot admin view is staged, independently approved, and fail closed", () => {
+  assert.match(app, /파일럿 체크리스트/);
+  assert.match(app, /합성 → 내부 shadow → 폐쇄 sandbox → 제한 지사 pilot/);
+  assert.match(app, /법률·정부·보험 승인이 아닙니다/);
+  assert.match(app, /자동 격리/);
+  assert.match(app, /독립 2인 승인 전에는 재개하지 않습니다/);
+});

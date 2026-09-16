@@ -6,6 +6,7 @@ import json
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from datetime import datetime, time
+from heapq import nlargest
 
 from .notifications import (
     Channel,
@@ -16,6 +17,9 @@ from .notifications import (
     NotificationService,
     Preference,
 )
+from .resource_limits import JsonBudget, ResourceLimitExceeded, bounded_json_object
+
+MAX_NOTIFICATION_PAGE = 100
 
 
 @dataclass(frozen=True)
@@ -49,8 +53,17 @@ class NotificationApi:
                 )
                 return NotificationResponse(200, asdict(self.service.set_preference(principal, preference)))
             if request.method == "GET" and request.path == "/api/v1/notifications":
-                notices = [asdict(item) for item in self.service.outbox.values()
-                           if item.recipient_id == principal.recipient_id and item.branch_id == principal.branch_id]
+                visible = (
+                    item for item in self.service.outbox.values()
+                    if item.recipient_id == principal.recipient_id
+                    and item.branch_id == principal.branch_id
+                )
+                notices = [
+                    asdict(item)
+                    for item in nlargest(
+                        MAX_NOTIFICATION_PAGE, visible, key=lambda item: item.sequence
+                    )
+                ]
                 return NotificationResponse(200, notices)
             if request.method == "POST" and request.path == "/api/v1/notifications":
                 body = self._body(request)
@@ -71,10 +84,10 @@ class NotificationApi:
     def _body(request: NotificationRequest) -> dict[str, object]:
         if request.headers.get("Content-Type") != "application/json" or len(request.body) > 32_768:
             raise ValueError
-        body = json.loads(request.body)
-        if not isinstance(body, dict):
-            raise TypeError
-        return body
+        try:
+            return bounded_json_object(request.body, JsonBudget(max_bytes=32_768))
+        except ResourceLimitExceeded as error:
+            raise ValueError from error
 
     @staticmethod
     def _str(body: Mapping[str, object], key: str) -> str:
@@ -111,4 +124,3 @@ class NotificationApi:
         if not isinstance(value, str):
             raise TypeError
         return time.fromisoformat(value)
-

@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-rc.6",
+  "version": "0.1.0-rc.7",
   "evidence": [
     {
       "id": "ci-269",
@@ -258,6 +258,13 @@
       "category": "assistive_technology_test",
       "digest": null,
       "status": "missing"
+    },
+    {
+      "id": "external-blockers-063",
+      "category": "external_blocker_tracking",
+      "digest": "8b929b14c8a88ce03048893777a48b44dd083c37b0504eba134a865cf869fea3",
+      "status": "pass",
+      "reference": "config://external-blockers.json"
     }
   ]
 }

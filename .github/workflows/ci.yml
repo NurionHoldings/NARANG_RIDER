@@ -94,11 +94,23 @@ jobs:
       - name: Critical coverage gap inventory
         run: python scripts/check_coverage_gaps.py
 
+      - name: Deterministic OpenAPI contract and compatibility baseline
+        run: PYTHONPATH=src python scripts/generate_openapi.py
+
       - name: Operational handoff reference freshness
         run: PYTHONPATH=src python scripts/verify_handoff_refs.py
 
       - name: Tests
         run: pytest -q
+
+      - name: Upload OpenAPI contract evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-contract
+          path: |
+            api/openapi.json
+            api/openapi.sha256
+            frontend/src/openapi-contract.ts
 
       - name: Deterministic model invariant smoke seeds
         run: python tests/model_harness.py --profile smoke

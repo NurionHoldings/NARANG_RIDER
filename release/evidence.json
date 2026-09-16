@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-rc.6",
+  "version": "0.1.0-rc.10",
   "evidence": [
     {
       "id": "ci-269",
@@ -258,6 +258,48 @@
       "category": "assistive_technology_test",
       "digest": null,
       "status": "missing"
+    },
+    {
+      "id": "map-document-071",
+      "category": "map_document_monitor",
+      "digest": "37ce6dbd0cb54586d3721c4acb2ccb9639b62dab86d044ffcf84b4ff04fdd225",
+      "status": "pass",
+      "reference": "src://narang_rider/map_document_monitor.py"
+    },
+    {
+      "id": "map-sandbox-072",
+      "category": "map_sandbox_contract",
+      "digest": "4305abea03705598a8d502074c8db3ff0a721e898fc2d9b203ccee17732184ea",
+      "status": "pass",
+      "reference": "src://narang_rider/map_sandbox_contract.py"
+    },
+    {
+      "id": "device-evidence-073",
+      "category": "device_certification_evidence",
+      "digest": "53d924c6b9c530be08982d5410c7ea872e5a184a0315a3f60325e3ed8522319b",
+      "status": "pass",
+      "reference": "src://narang_rider/device_certification_evidence.py"
+    },
+    {
+      "id": "route-shadow-074",
+      "category": "route_quality_shadow",
+      "digest": "6a77a545480ecdff89b3c8689c3fd8a8bbbbf3443fd3e090b12ab7eb03d5cf2c",
+      "status": "pass",
+      "reference": "src://narang_rider/route_quality_shadow.py"
+    },
+    {
+      "id": "map-resilience-075",
+      "category": "map_provider_resilience",
+      "digest": "4cda1d63629db389d764c11f9442a5181f3b361069c1cae2ba3edaa723aa3266",
+      "status": "pass",
+      "reference": "src://narang_rider/map_provider_resilience.py"
+    },
+    {
+      "id": "map-gate-076",
+      "category": "map_release_gate",
+      "digest": "c8aa500fd3ba7f59e50974a9e21616bbdc69994972e240366c2dfbf73c6a89e2",
+      "status": "pass",
+      "reference": "src://narang_rider/map_release_gate.py"
     }
   ]
 }

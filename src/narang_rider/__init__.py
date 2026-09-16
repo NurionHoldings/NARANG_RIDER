@@ -16,6 +16,17 @@ from .lifecycle import (
     QuoteSnapshot,
 )
 from .money import Money
+from .payments import (
+    PaymentEventType,
+    PaymentRecord,
+    PaymentState,
+    PaymentWebhookService,
+    PayoutDestination,
+    PayoutDestinationRegistry,
+    PayoutInstruction,
+    PayoutInstructionService,
+    ProviderPaymentEvent,
+)
 from .pricing import DeliveryFacts, MerchantOrderEconomics, PricingPolicy, PublicQuote
 
 __all__ = [
@@ -35,6 +46,14 @@ __all__ = [
     "MerchantOrderEconomics",
     "Money",
     "OfferLease",
+    "PaymentEventType",
+    "PaymentRecord",
+    "PaymentState",
+    "PaymentWebhookService",
+    "PayoutDestination",
+    "PayoutDestinationRegistry",
+    "PayoutInstruction",
+    "PayoutInstructionService",
     "OfferLeaseService",
     "OfferStatus",
     "Order",
@@ -42,6 +61,7 @@ __all__ = [
     "OrderRepository",
     "OrderState",
     "PricingPolicy",
+    "ProviderPaymentEvent",
     "PublicQuote",
     "QuoteRepository",
     "QuoteSnapshot",

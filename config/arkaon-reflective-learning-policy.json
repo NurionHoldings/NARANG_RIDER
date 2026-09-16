@@ -1,0 +1,12 @@
+{
+  "schema_version": "narang.arkaon-reflective-learning.v1",
+  "flow": ["OBSERVED", "SELF_GAP_IDENTIFIED", "HYPOTHESIS_PROPOSED", "SYNTHETIC_SHADOWED", "ETERNIAN_REVIEWED", "OPERATOR_DECIDED", "LESSON_RECORDED"],
+  "records_strengths_and_gaps": true,
+  "records_rejected_and_failed_lessons": true,
+  "shared_memory": ["PUBLIC_EVIDENCE", "ABSTRACT_POLICY", "SYNTHETIC_TEST_PATTERN", "REVIEWED_LESSON"],
+  "forbidden_shared_memory": ["MEMBER", "ORDER", "LOCATION", "PAYMENT", "SETTLEMENT", "IDENTITY"],
+  "self_weight_change": false,
+  "self_approval": false,
+  "automatic_standard_relaxation": false,
+  "automatic_operational_application": false
+}

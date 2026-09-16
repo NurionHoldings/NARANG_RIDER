@@ -32,6 +32,8 @@ UP = Path("migrations/0001_postgres_persistence.sql").read_text()
 DOWN = Path("migrations/0001_postgres_persistence.down.sql").read_text()
 SETTLEMENT_UP = Path("migrations/0002_settlement_operations.sql").read_text()
 SETTLEMENT_DOWN = Path("migrations/0002_settlement_operations.down.sql").read_text()
+CONTROL_UP = Path("migrations/0003_control_center.sql").read_text()
+CONTROL_DOWN = Path("migrations/0003_control_center.down.sql").read_text()
 
 
 def connect() -> Any:
@@ -64,10 +66,12 @@ def grant_application_access() -> None:
 @pytest.fixture(autouse=True)
 def fresh_schema() -> None:
     ensure_application_role()
+    migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
     migrate(DOWN)
     migrate(UP)
     migrate(SETTLEMENT_UP)
+    migrate(CONTROL_UP)
     grant_application_access()
 
 
@@ -102,21 +106,25 @@ def create_order(
 
 
 def test_migration_fresh_down_up_is_repeatable() -> None:
+    migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
     migrate(DOWN)
     migrate(UP)
     migrate(SETTLEMENT_UP)
+    migrate(CONTROL_UP)
     grant_application_access()
+    migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
     migrate(DOWN)
     migrate(UP)
     migrate(SETTLEMENT_UP)
+    migrate(CONTROL_UP)
     grant_application_access()
     with connect() as connection:
         versions = connection.execute(
             "SELECT version FROM schema_migrations ORDER BY version"
         ).fetchall()
-    assert versions == [(1,), (2,)]
+    assert versions == [(1,), (2,), (3,)]
 
 
 def test_rls_hides_other_branches_and_rejects_cross_branch_insert() -> None:

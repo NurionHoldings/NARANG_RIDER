@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-rc.4",
+  "version": "0.1.0-rc.5",
   "evidence": [
     {"id":"ci-269","category":"ci_jobs","digest":"local-ci-green","status":"pass","reference":"github-actions://269"},
     {"id":"migration-contract","category":"migrations","digest":"migration-contract-green","status":"pass","reference":"test://postgres-live"},
@@ -14,6 +14,8 @@
     {"id":"supply-chain-052","category":"supply_chain_inventory","digest":"offline-policy-green","status":"pass","reference":"artifact://supply-chain-provenance"},
     {"id":"coverage-gap-054","category":"critical_coverage_gap_inventory","digest":"b4cced8ae7133184e5031741c3ea37000e35e35dcd0d1f62820f3ccac841f9d2","status":"pass","reference":"audit://coverage-gap-report.json"},
     {"id":"openapi-055","category":"deterministic_openapi_contract","digest":"b861fba4f7972c59a63ddb1af2608f3f305fa00274d8a3e9361770d42e214bb8","status":"pass","reference":"artifact://openapi-contract"},
+    {"id":"a11y-057","category":"accessibility_independent_audit","digest":"457e75ad66724c6cc71a1a0f8d365e7b4189010a21641784299f2acbf3ebfb94","status":"pass","reference":"docs://25-korean-ux-accessibility-audit"},
+    {"id":"migration-recovery-058","category":"migration_recovery_drill","digest":"3524c8ca68ed90bcaef2bcd803e297f2be0f9ab0178f434bc5a494298c2e2634","status":"pass","reference":"artifact://migration-recovery-drill"},
     {"id":"bugbot-054","category":"external_bugbot_review","digest":null,"status":"missing","reference":"usage-limit; independent audit substitute is not external approval"},
     {"id":"partner-api","category":"partner_official_api","digest":null,"status":"missing"},
     {"id":"partner-creds","category":"partner_sandbox_credentials","digest":null,"status":"missing"},

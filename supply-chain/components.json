@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-16",
+  "release_status": "BLOCKED",
+  "policy": {
+    "allow": ["Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "MIT", "PSF-2.0"],
+    "review": ["LGPL-3.0-only", "MPL-2.0"],
+    "deny_without_written_approval": ["AGPL-3.0-only", "AGPL-3.0-or-later", "GPL-2.0-only", "GPL-2.0-or-later", "GPL-3.0-only", "GPL-3.0-or-later", "UNKNOWN"]
+  },
+  "components": [
+    {"ecosystem":"python","name":"pytest","version":"8.4.2","scope":"development","direct":true,"source":"https://pypi.org/project/pytest/8.4.2/","license":"MIT","hash":null,"release_blocker":"lock_has_no_hash"},
+    {"ecosystem":"python","name":"ruff","version":"0.13.2","scope":"development","direct":true,"source":"https://pypi.org/project/ruff/0.13.2/","license":"MIT","hash":null,"release_blocker":"lock_has_no_hash"},
+    {"ecosystem":"python","name":"hatchling","version":"1.27.0","scope":"build","direct":true,"source":"https://pypi.org/project/hatchling/1.27.0/","license":"MIT","hash":null,"release_blocker":"lock_has_no_hash"},
+    {"ecosystem":"python","name":"psycopg-binary","version":"3.2.10","scope":"test","direct":true,"source":"https://pypi.org/project/psycopg-binary/3.2.10/","license":"LGPL-3.0-only","hash":null,"release_blocker":"license_and_hash_review"},
+    {"ecosystem":"npm","name":"typescript","version":"5.6.3","scope":"development","direct":true,"source":"https://registry.npmjs.org/typescript/-/typescript-5.6.3.tgz","license":"Apache-2.0","hash":"sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==","package_scripts":false,"native_binary":false,"reviewed_bins":["tsc","tsserver"]},
+    {"ecosystem":"container","name":"python","version":"3.11.13-slim-bookworm","scope":"build-and-runtime","direct":true,"source":"docker.io/library/python","license":"UNKNOWN","digest":null,"release_blocker":"base_image_digest_and_license_unverified"},
+    {"ecosystem":"container","name":"postgres","version":"16","scope":"ci-test","direct":true,"source":"docker.io/library/postgres","license":"PostgreSQL","digest":null,"release_blocker":"ci_image_digest_unpinned"},
+    {"ecosystem":"github-action","name":"actions/checkout","version":"v4","scope":"ci","direct":true,"source":"https://github.com/actions/checkout","license":"MIT","digest":null,"release_blocker":"action_not_pinned_to_commit"},
+    {"ecosystem":"github-action","name":"actions/setup-python","version":"v5","scope":"ci","direct":true,"source":"https://github.com/actions/setup-python","license":"MIT","digest":null,"release_blocker":"action_not_pinned_to_commit"},
+    {"ecosystem":"github-action","name":"actions/setup-node","version":"v4","scope":"ci","direct":true,"source":"https://github.com/actions/setup-node","license":"MIT","digest":null,"release_blocker":"action_not_pinned_to_commit"},
+    {"ecosystem":"github-action","name":"actions/upload-artifact","version":"v4","scope":"ci","direct":true,"source":"https://github.com/actions/upload-artifact","license":"MIT","digest":null,"release_blocker":"action_not_pinned_to_commit"}
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "contains_personal_data": false,
+  "contains_secrets": false,
+  "generator": {
+    "name": "narang_rider.protocol_fuzz",
+    "ci_seed": 1312903745,
+    "ci_cases": 1000,
+    "manual_profile": {
+      "environment": "NARANG_FUZZ_PROFILE=large",
+      "cases": 20000
+    }
+  },
+  "minimized_regressions": [
+    {
+      "id": "duplicate-authorization-casefold",
+      "surface": "headers",
+      "input": [["Authorization", "Bearer redacted-a"], ["authorization", "Bearer redacted-b"]],
+      "expected_error": "header.duplicate_ambiguous"
+    },
+    {
+      "id": "duplicate-json-key",
+      "surface": "json",
+      "input_utf8": "{\"branch_id\":\"branch-01\",\"branch_id\":\"branch-02\"}",
+      "expected_error": "json.duplicate_key"
+    },
+    {
+      "id": "invalid-utf8-single-byte",
+      "surface": "json_transport",
+      "input_hex": "ff",
+      "expected_error": "body.invalid_utf8"
+    },
+    {
+      "id": "jwt-none-algorithm",
+      "surface": "jwt",
+      "input_template": "base64url({alg:none,kid:key-0001}).valid_claims.signature",
+      "expected_error": "jwt.algorithm_rejected"
+    },
+    {
+      "id": "encoded-path-separator",
+      "surface": "request_target",
+      "input_ascii": "/v1/orders%2Fadmin",
+      "expected_error": "target.encoded_separator"
+    },
+    {
+      "id": "critical-query-duplicate",
+      "surface": "query",
+      "input_ascii": "/v1/orders?branch_id=branch-01&branch_id=branch-02",
+      "expected_error": "query.duplicate_ambiguous"
+    },
+    {
+      "id": "webhook-signature-length",
+      "surface": "webhook",
+      "input": {"x-webhook-signature": "sha256=00", "x-webhook-timestamp": "1000"},
+      "expected_error": "webhook.signature.invalid"
+    },
+    {
+      "id": "partner-sequence-negative",
+      "surface": "partner_envelope",
+      "input_utf8": "{\"event_id\":\"event-001\",\"order_id\":\"order-001\",\"branch_id\":\"branch-01\",\"sequence\":-1,\"status\":\"picked-up\"}",
+      "expected_error": "partner.sequence.invalid"
+    },
+    {
+      "id": "spreadsheet-formula-injection",
+      "surface": "import",
+      "input": ["=1+1"],
+      "expected_error": "import.formula_rejected"
+    }
+  ]
+}

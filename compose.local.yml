@@ -1,0 +1,79 @@
+name: narang-rider-local
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: narang_local
+      POSTGRES_USER: narang_local
+      POSTGRES_PASSWORD: synthetic-local-only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U narang_local -d narang_local"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    networks: [data]
+    tmpfs: [/var/lib/postgresql/data]
+  migrate:
+    image: postgres:16.4-alpine
+    environment:
+      DATABASE_URL: postgresql://narang_local:synthetic-local-only@postgres/narang_local
+    volumes:
+      - ./migrations:/migrations:ro
+      - ./local-stack/migrate.sh:/migrate.sh:ro
+    entrypoint: ["/bin/sh", "/migrate.sh"]
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [data]
+    read_only: true
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    environment:
+      NARANG_ENV: local-synthetic
+      DATABASE_CONFIG_REF: config://local/postgres
+      JWKS_CONFIG_REF: config://local/mock-jwks
+    ports: ["127.0.0.1:18000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready',timeout=2)"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    networks: [edge, data]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+  outbox-worker:
+    build: {context: ., dockerfile: Dockerfile.local}
+    command: ["python", "-m", "narang_rider.local_stack", "--worker"]
+    environment: {NARANG_ENV: local-synthetic}
+    depends_on:
+      app: {condition: service_healthy}
+    networks: [data]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+  mocks:
+    build: {context: ., dockerfile: Dockerfile.local}
+    environment: {NARANG_ENV: local-synthetic, PORT: "8100"}
+    depends_on:
+      app: {condition: service_healthy}
+    networks: [edge]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: [no-new-privileges:true]
+  frontend:
+    image: nginxinc/nginx-unprivileged:1.27.1-alpine
+    volumes: ["./local-stack/index.html:/usr/share/nginx/html/index.html:ro"]
+    ports: ["127.0.0.1:18080:8080"]
+    depends_on:
+      app: {condition: service_healthy}
+    networks: [edge]
+    read_only: true
+    tmpfs: [/tmp, /var/cache/nginx, /var/run]
+    security_opt: [no-new-privileges:true]
+networks:
+  edge: {internal: true}
+  data: {internal: true}

@@ -1,0 +1,29 @@
+{
+  "schema": "narang.map-release-gate-policy.v1",
+  "version": "1.0.0",
+  "required_internal_evidence": [
+    "document_monitor",
+    "sandbox_contract",
+    "device_certification",
+    "route_quality_shadow",
+    "provider_resilience"
+  ],
+  "required_external_gates": ["EXT-02", "EXT-03", "EXT-04", "EXT-05", "EXT-07"],
+  "evidence_rules": {
+    "same_candidate_commit": true,
+    "unexpired": true,
+    "sha256_digest": true,
+    "synthetic_internal_evidence_only": true,
+    "duplicate_type_forbidden": true
+  },
+  "approval_separation": {
+    "ethernian_final_review_required": true,
+    "operator_decision_required": true,
+    "same_reference_forbidden": true
+  },
+  "maximum_automated_verdict": "READY_FOR_OPERATOR_DECISION",
+  "automatic_main_merge": false,
+  "automatic_deployment": false,
+  "automatic_production_activation": false,
+  "production_status": "BLOCKED"
+}

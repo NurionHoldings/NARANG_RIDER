@@ -1,0 +1,62 @@
+openapi: 3.1.0
+info:
+  title: NARANG RIDER Navigation Handoff Contract
+  version: 0.1.0-rc.7
+  description: Supplemental blocked contract; merge into the canonical API only after certification.
+paths:
+  /api/v1/rider/assignments/{assignment_id}/navigation/providers:
+    get:
+      operationId: listRiderNavigationProviders
+      summary: List installed and currently certified navigation choices
+      parameters:
+        - {name: assignment_id, in: path, required: true, schema: {type: string}}
+        - {name: X-Branch-Id, in: header, required: true, schema: {type: string}}
+      responses:
+        "200":
+          description: Privacy-safe provider metadata; no destination is returned.
+        "403": {description: Rider, order, or branch scope mismatch}
+        "503": {description: Provider knowledge stale or uncertified}
+  /api/v1/rider/assignments/{assignment_id}/navigation/handoffs:
+    post:
+      operationId: createRiderNavigationHandoff
+      summary: Create an ephemeral, explicitly chosen external navigation handoff
+      parameters:
+        - {name: assignment_id, in: path, required: true, schema: {type: string}}
+        - {name: X-Branch-Id, in: header, required: true, schema: {type: string}}
+        - {name: X-CSRF-Token, in: header, required: true, schema: {type: string}}
+        - {name: Idempotency-Key, in: header, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [provider_id, destination_token, consented, session_id]
+              properties:
+                provider_id: {type: string}
+                destination_token:
+                  type: string
+                  description: One-time opaque Vault/location-boundary token; never a raw address.
+                consented: {type: boolean, const: true}
+                session_id: {type: string}
+      responses:
+        "201":
+          description: Ephemeral handoff, valid for at most fifteen minutes
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [launch_id, external_url, expires_at, disclosure, fallback_label]
+                properties:
+                  launch_id: {type: string}
+                  external_url: {type: string, format: uri}
+                  expires_at: {type: string, format: date-time}
+                  disclosure: {type: string}
+                  fallback_label: {type: string}
+        "403": {description: Rider, order, or branch scope mismatch}
+        "409": {description: Idempotency conflict or destination token reuse}
+        "410": {description: Session or one-time token expired}
+        "422": {description: Target failed scheme, host, path, or query allowlist}
+        "503": {description: App unavailable, provider knowledge stale, or adapter uncertified}

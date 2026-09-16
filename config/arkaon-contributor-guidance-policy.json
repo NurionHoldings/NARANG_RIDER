@@ -1,0 +1,23 @@
+{
+  "schema_version": "narang.arkaon-contributor-guidance-policy.v1",
+  "visitor_tracking": false,
+  "inputs": ["CHANGED_REPOSITORY_PATHS", "DECLARED_EVIDENCE"],
+  "allowed_actions": ["ANALYZE", "GUIDE", "PROPOSE_REMEDIATION", "RETEST"],
+  "forbidden_actions": [
+    "IDENTIFY_PASSIVE_VISITOR",
+    "PROFILE_CONTRIBUTOR",
+    "GRANT_PERMISSION",
+    "AUTO_APPROVE",
+    "MERGE",
+    "DEPLOY",
+    "WAIVE_FAILED_CHECK"
+  ],
+  "surfaces": [
+    "ARKAON_GUIDE.md",
+    "CONTRIBUTING.md",
+    ".github/pull_request_template.md",
+    "GITHUB_STEP_SUMMARY",
+    "CI_ARTIFACT"
+  ],
+  "maximum_outcome": "ADVISORY_REPORT"
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "narang.mobility-plaza-authority-registry.v1",
+  "reviewed_on": "2026-09-16",
+  "status": "HUMAN_REVIEW_REQUIRED",
+  "sources": [
+    {"authority": "LAW_GO_KR", "title": "금융소비자 보호에 관한 법률", "url": "https://www.law.go.kr/법령/금융소비자보호에관한법률", "use": "금융상품 설명·광고·판매 경계"},
+    {"authority": "LAW_GO_KR", "title": "보험업법", "url": "https://www.law.go.kr/법령/보험업법", "use": "보험모집·인수 권한 경계"},
+    {"authority": "LAW_GO_KR", "title": "전자상거래 등에서의 소비자보호에 관한 법률", "url": "https://www.law.go.kr/법령/전자상거래등에서의소비자보호에관한법률", "use": "통신판매중개·표시·분쟁 경계"},
+    {"authority": "LAW_GO_KR", "title": "개인정보 보호법", "url": "https://www.law.go.kr/법령/개인정보보호법", "use": "목적 제한·최소처리·정보주체 권리"},
+    {"authority": "PIPC", "title": "개인정보보호위원회 안내서", "url": "https://www.pipc.go.kr/np/cop/bbs/selectBoardList.do?bbsId=BS217&mCode=D010030000", "use": "개인정보 처리 운영통제"},
+    {"authority": "KISA", "title": "합성데이터 생성·활용 안내서", "url": "https://www.kisa.or.kr/2060204/form?postSeq=16", "use": "합성시험 데이터 경계"}
+  ],
+  "notice": "This registry records official-source research targets. It is not legal approval and cannot activate a service."
+}

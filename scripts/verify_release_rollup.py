@@ -24,10 +24,10 @@ def main() -> int:
     evidence = json.loads(Path(args.evidence).read_text(encoding="utf-8"))
     failures: list[str] = []
 
-    expected_prs = list(range(1, 59))
+    expected_prs = list(range(1, 62))
     if manifest["included_pull_requests"] != expected_prs:
-        failures.append("included PRs must be the contiguous range 1..58")
-    if manifest["version"] != "0.1.0-rc.5" or manifest["purpose"] != "REVIEW_ONLY":
+        failures.append("included PRs must be the contiguous range 1..61")
+    if manifest["version"] != "0.1.0-rc.6" or manifest["purpose"] != "REVIEW_ONLY":
         failures.append("rollup identity or purpose mismatch")
     if manifest["release_verdict"] != "BLOCKED":
         failures.append("rollup release verdict must remain BLOCKED")
@@ -51,8 +51,8 @@ def main() -> int:
     if merge_commits.returncode or merge_commits.stdout.strip():
         failures.append("rollup history contains merge commits or cannot be inspected")
     commit_count = git("rev-list", "--count", f"{main_commit}..{args.head}")
-    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 58:
-        failures.append("rollup history is unexpectedly short for PRs 1..58")
+    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 61:
+        failures.append("rollup history is unexpectedly short for PRs 1..61")
 
     required_internal = {
         "independent_security_finance_audit",
@@ -63,6 +63,8 @@ def main() -> int:
         "deterministic_openapi_contract",
         "accessibility_independent_audit",
         "migration_recovery_drill",
+        "external_provider_intake_packet",
+        "professional_review_packet",
     }
 
     evidence_by_category = {item["category"]: item["status"] for item in evidence["evidence"]}
@@ -74,6 +76,8 @@ def main() -> int:
         "deterministic_openapi_contract": "api/openapi.json",
         "accessibility_independent_audit": "docs/25-korean-ux-accessibility-audit.md",
         "migration_recovery_drill": "build/migration-recovery-drill.json",
+        "external_provider_intake_packet": "docs/28-external-provider-sandbox-intake.md",
+        "professional_review_packet": "docs/29-professional-independent-review-packet.md",
     }
     evidence_items = {item["category"]: item for item in evidence["evidence"]}
     for category, path in artifact_hashes.items():

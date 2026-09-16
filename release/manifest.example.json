@@ -1,0 +1,12 @@
+{
+  "commit_sha": "0000000000000000000000000000000000000000",
+  "migration_version": 5,
+  "api_version": "v1",
+  "frontend_version": "0.1.0",
+  "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "rollback_target_sha": "1111111111111111111111111111111111111111",
+  "security_ci_passed": false,
+  "postgres_restore_passed": false,
+  "approver_ids": [],
+  "deployment_enabled": false
+}

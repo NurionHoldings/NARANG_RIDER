@@ -36,6 +36,8 @@ CONTROL_UP = Path("migrations/0003_control_center.sql").read_text()
 CONTROL_DOWN = Path("migrations/0003_control_center.down.sql").read_text()
 INCIDENT_UP = Path("migrations/0004_rider_incident_support.sql").read_text()
 INCIDENT_DOWN = Path("migrations/0004_rider_incident_support.down.sql").read_text()
+NOTIFICATION_UP = Path("migrations/0005_notification_delivery.sql").read_text()
+NOTIFICATION_DOWN = Path("migrations/0005_notification_delivery.down.sql").read_text()
 
 
 def connect() -> Any:
@@ -68,6 +70,7 @@ def grant_application_access() -> None:
 @pytest.fixture(autouse=True)
 def fresh_schema() -> None:
     ensure_application_role()
+    migrate(NOTIFICATION_DOWN)
     migrate(INCIDENT_DOWN)
     migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
@@ -76,6 +79,7 @@ def fresh_schema() -> None:
     migrate(SETTLEMENT_UP)
     migrate(CONTROL_UP)
     migrate(INCIDENT_UP)
+    migrate(NOTIFICATION_UP)
     grant_application_access()
 
 
@@ -110,6 +114,7 @@ def create_order(
 
 
 def test_migration_fresh_down_up_is_repeatable() -> None:
+    migrate(NOTIFICATION_DOWN)
     migrate(INCIDENT_DOWN)
     migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
@@ -118,7 +123,9 @@ def test_migration_fresh_down_up_is_repeatable() -> None:
     migrate(SETTLEMENT_UP)
     migrate(CONTROL_UP)
     migrate(INCIDENT_UP)
+    migrate(NOTIFICATION_UP)
     grant_application_access()
+    migrate(NOTIFICATION_DOWN)
     migrate(INCIDENT_DOWN)
     migrate(CONTROL_DOWN)
     migrate(SETTLEMENT_DOWN)
@@ -127,12 +134,47 @@ def test_migration_fresh_down_up_is_repeatable() -> None:
     migrate(SETTLEMENT_UP)
     migrate(CONTROL_UP)
     migrate(INCIDENT_UP)
+    migrate(NOTIFICATION_UP)
     grant_application_access()
     with connect() as connection:
         versions = connection.execute(
             "SELECT version FROM schema_migrations ORDER BY version"
         ).fetchall()
-    assert versions == [(1,), (2,), (3,), (4,)]
+    assert versions == [(1,), (2,), (3,), (4,), (5,)]
+
+
+def test_notification_outbox_rls_idempotency_and_rights_guard() -> None:
+    with psycopg.connect(ADMIN_DSN) as connection:
+        connection.execute(
+            "INSERT INTO control_branches(branch_id,level,service_zone_ids,active) "
+            "VALUES ('sejong','LOCAL','[]'::jsonb,true),('daejeon','LOCAL','[]'::jsonb,true)"
+        )
+        connection.execute(
+            "INSERT INTO notification_outbox "
+            "(branch_id,notice_id,recipient_id,event,event_id,sequence,channel,template_version,lockscreen_text,deep_link,state) "
+            "VALUES ('sejong','notice-1','recipient-1','DELIVERY_COMPLETE','event-1',1,'IN_APP',1,'배송이 완료되었습니다.','opaque.token','PENDING')"
+        )
+        with pytest.raises(psycopg.errors.CheckViolation):
+            connection.execute(
+                "INSERT INTO notification_outbox "
+                "(branch_id,notice_id,recipient_id,event,event_id,sequence,channel,template_version,lockscreen_text,deep_link,state,acknowledgement_limits_rights) "
+                "VALUES ('sejong','notice-bad','recipient-1','DISPUTE','event-2',2,'IN_APP',1,'상태 변경','opaque.token','PENDING',true)"
+            )
+        connection.rollback()
+    with psycopg.connect(ADMIN_DSN) as connection:
+        connection.execute(
+            "INSERT INTO control_branches(branch_id,level,service_zone_ids,active) "
+            "VALUES ('sejong','LOCAL','[]'::jsonb,true),('daejeon','LOCAL','[]'::jsonb,true)"
+        )
+        connection.execute(
+            "INSERT INTO notification_outbox "
+            "(branch_id,notice_id,recipient_id,event,event_id,sequence,channel,template_version,lockscreen_text,deep_link,state) "
+            "VALUES ('sejong','notice-1','recipient-1','DELIVERY_COMPLETE','event-1',1,'IN_APP',1,'배송이 완료되었습니다.','opaque.token','PENDING')"
+        )
+        connection.commit()
+    with connect() as connection:
+        connection.execute("SELECT set_config('app.branch_id', 'daejeon', true)")
+        assert connection.execute("SELECT notice_id FROM notification_outbox").fetchall() == []
 
 
 def test_incident_coverage_is_immutable_and_cases_are_branch_isolated() -> None:

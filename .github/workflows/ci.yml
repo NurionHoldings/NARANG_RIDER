@@ -101,6 +101,9 @@ jobs:
       - name: Operational handoff reference freshness
         run: PYTHONPATH=src python scripts/verify_handoff_refs.py
 
+      - name: Synthetic migration and recovery safety drill
+        run: PYTHONPATH=src python scripts/run_migration_recovery_drill.py
+
       - name: Tests
         run: pytest -q
 
@@ -112,6 +115,8 @@ jobs:
             api/openapi.json
             api/openapi.sha256
             frontend/src/openapi-contract.ts
+            build/migration-recovery-drill.json
+            build/migration-recovery-drill.json.sha256
 
       - name: Deterministic model invariant smoke seeds
         run: python tests/model_harness.py --profile smoke

@@ -1,4 +1,6 @@
 BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '60s';
 CREATE TABLE rider_coverage_snapshots (
  branch_id text NOT NULL REFERENCES control_branches(branch_id), snapshot_id text NOT NULL,
  assignment_id text NOT NULL, rider_id text NOT NULL, provider_reference text NOT NULL,
@@ -28,6 +30,9 @@ CREATE TABLE rider_incident_audit (
  sensitive_access boolean NOT NULL DEFAULT false, created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
  PRIMARY KEY(branch_id,sequence)
 );
+CREATE TRIGGER immutable_rider_incident_audit
+BEFORE UPDATE OR DELETE ON rider_incident_audit
+FOR EACH ROW EXECUTE FUNCTION reject_append_only_mutation();
 DO $rls$ DECLARE n text; BEGIN FOREACH n IN ARRAY ARRAY[
  'rider_coverage_snapshots','rider_incident_cases','rider_incident_audit'] LOOP
  EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY',n);

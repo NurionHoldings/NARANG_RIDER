@@ -122,6 +122,9 @@ jobs:
       - name: ARKAON pre-deployment readiness report
         run: PYTHONPATH=src python scripts/run_predeployment_readiness.py
 
+      - name: ARKAON contributor preflight guidance
+        run: PYTHONPATH=src python scripts/run_contributor_guidance.py --base "${{ github.event.pull_request.base.sha || github.event.before }}"
+
       - name: Upload OpenAPI contract evidence
         uses: actions/upload-artifact@v4
         with:
@@ -142,6 +145,8 @@ jobs:
             build/contract-lifecycle-evidence.json.sha256
             build/arkaon-predeployment-readiness.json
             build/arkaon-predeployment-readiness.json.sha256
+            build/arkaon-contributor-guidance.json
+            build/arkaon-contributor-guidance.json.sha256
 
       - name: Deterministic model invariant smoke seeds
         run: python tests/model_harness.py --profile smoke

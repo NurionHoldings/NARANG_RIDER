@@ -3,6 +3,17 @@
 from .dispatch import DispatchCandidate, DispatchReceipt, FairDispatchPolicy
 from .evidence import DeliveryEvidenceBundle, EvidenceMethod, EvidenceStage
 from .ledger import Ledger, LedgerAccount, LedgerEntry
+from .lifecycle import (
+    OfferLease,
+    OfferLeaseService,
+    OfferStatus,
+    Order,
+    OrderEvent,
+    OrderRepository,
+    OrderState,
+    QuoteRepository,
+    QuoteSnapshot,
+)
 from .money import Money
 from .pricing import DeliveryFacts, MerchantOrderEconomics, PricingPolicy, PublicQuote
 
@@ -19,6 +30,15 @@ __all__ = [
     "LedgerEntry",
     "MerchantOrderEconomics",
     "Money",
+    "OfferLease",
+    "OfferLeaseService",
+    "OfferStatus",
+    "Order",
+    "OrderEvent",
+    "OrderRepository",
+    "OrderState",
     "PricingPolicy",
     "PublicQuote",
+    "QuoteRepository",
+    "QuoteSnapshot",
 ]

@@ -12,7 +12,6 @@ from narang_rider.lifecycle import (
 from narang_rider.money import Money
 from narang_rider.pricing import DeliveryFacts, PricingPolicy, quote_delivery
 
-
 NOW = datetime(2026, 9, 16, 1, 0, tzinfo=UTC)
 
 

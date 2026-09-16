@@ -164,6 +164,14 @@ from .rollout import (
     OutputAuthority,
     RolloutStage,
 )
+from .runtime import (
+    NarangAsgiApp,
+    NullLogger,
+    RuntimeConfig,
+    RuntimeDependencies,
+    create_runtime,
+    create_test_runtime,
+)
 
 __all__ = [
     "MAX_REQUEST_BYTES",
@@ -249,8 +257,10 @@ __all__ = [
     "Merchant",
     "MerchantOrderEconomics",
     "Money",
+    "NarangAsgiApp",
     "NationalAccuracyVerdict",
     "NationalOperatingPolicy",
+    "NullLogger",
     "OfferLease",
     "OfferLeaseService",
     "OfferStatus",
@@ -299,6 +309,8 @@ __all__ = [
     "RiderCallRoute",
     "RolloutStage",
     "RouteContract",
+    "RuntimeConfig",
+    "RuntimeDependencies",
     "ScopedPrincipal",
     "SensitiveDataRejected",
     "SerializationRejected",
@@ -309,6 +321,8 @@ __all__ = [
     "TransportAuthVerifier",
     "VerifiedPrincipal",
     "canonical_payload_digest",
+    "create_runtime",
+    "create_test_runtime",
     "detect_error_drift",
     "evaluate_national_accuracy",
 ]

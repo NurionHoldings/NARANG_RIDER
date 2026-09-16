@@ -107,6 +107,9 @@ jobs:
       - name: Tests
         run: pytest -q
 
+      - name: ARKAON cross-platform synthetic capability benchmark
+        run: PYTHONPATH=src python scripts/run_arkaon_capability_benchmark.py
+
       - name: Upload OpenAPI contract evidence
         uses: actions/upload-artifact@v4
         with:
@@ -117,6 +120,8 @@ jobs:
             frontend/src/openapi-contract.ts
             build/migration-recovery-drill.json
             build/migration-recovery-drill.json.sha256
+            build/arkaon-capability-benchmark.json
+            build/arkaon-capability-benchmark.json.sha256
 
       - name: Deterministic model invariant smoke seeds
         run: python tests/model_harness.py --profile smoke

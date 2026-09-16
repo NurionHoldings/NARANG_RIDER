@@ -2,7 +2,23 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from narang_rider.privacy import *
+from narang_rider.privacy import (
+    PRIVACY_ROUTE_MANIFEST,
+    ConsentRecord,
+    DataCategory,
+    LegalHold,
+    PolicyRegistry,
+    PrivacyErrorCode,
+    PrivacyLifecycleService,
+    PrivacyPrincipal,
+    PrivacyRejected,
+    RequestState,
+    RightType,
+    SubjectDataRef,
+    SweepPhase,
+    VendorTransferApproval,
+    default_policy_registry,
+)
 
 
 NOW = datetime(2026, 9, 16, tzinfo=UTC)

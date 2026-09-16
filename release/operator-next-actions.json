@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "release": "0.1.0-rc.6",
+  "release": "0.1.0-rc.10",
   "verdict": "BLOCKED",
   "generated_for": "operator_review_only",
   "actions": [
@@ -27,7 +27,8 @@
       "evidence": [
         "비교평가표",
         "DPA·SLA·가격·재위탁자 목록",
-        "선정 서명참조"
+        "선정 서명참조",
+        "PR #78~#83 내부 지도 증거계보·통합게이트"
       ],
       "expiry": "가격·계약·재위탁자 변경 시",
       "blocker": "production_infrastructure"

@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from hashlib import sha256
+from typing import ClassVar
 from urllib.parse import parse_qsl, quote, urlsplit, urlunsplit
 
 from .map_integration import KnowledgeState, MapProviderKnowledgeRegistry
@@ -76,6 +77,7 @@ class CertifiedLinkForm:
             raise ValueError("scheme is not certified")
         if self.scheme == "https" and (
             not self.host
+            or any(character in self.host for character in "@/:?#")
             or self.host.encode("idna").decode("ascii") != self.host
             or self.host != self.host.lower()
         ):
@@ -122,7 +124,8 @@ class SingleUseLaunchTokens:
         self._consumed: set[str] = set()
 
     def consume(self, token: str, scope: str) -> None:
-        digest = sha256(f"{token}|{scope}".encode()).hexdigest()
+        del scope
+        digest = sha256(token.encode()).hexdigest()
         if digest in self._consumed:
             raise NavigationBridgeRejected("launch token replay")
         self._consumed.add(digest)
@@ -157,7 +160,7 @@ class ReturnStateStore:
 
 
 class MobileNavigationBridge:
-    SAFE_MESSAGES = {
+    SAFE_MESSAGES: ClassVar[dict[DeviceState, str]] = {
         DeviceState.APP_UNAVAILABLE: "선택한 지도 앱을 사용할 수 없습니다. 다른 앱이나 시스템 지도를 선택해 주세요.",
         DeviceState.UPDATE_REQUIRED: "지도 앱 업데이트가 필요합니다. 시스템 지도 또는 목적지 복사를 이용할 수 있습니다.",
         DeviceState.OS_RESTRICTED: "기기 설정에서 외부 앱 열기가 제한되었습니다. 시스템 지도나 복사를 선택해 주세요.",
@@ -288,14 +291,9 @@ class MobileNavigationBridge:
 
     @staticmethod
     def _scope(request: NavigationLaunchRequest) -> str:
-        return "|".join(
-            (
-                request.branch_id,
-                request.rider_id,
-                request.order_id,
-                request.assignment_id,
-                request.session_id,
-            )
+        return (
+            f"{request.branch_id}|{request.rider_id}|{request.order_id}|"
+            f"{request.assignment_id}|{request.session_id}"
         )
 
     @staticmethod

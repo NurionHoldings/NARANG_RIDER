@@ -134,6 +134,9 @@ jobs:
       - name: ARKAON experience and operations audit
         run: PYTHONPATH=src python scripts/run_experience_operations_audit.py
 
+      - name: ARKAON reflective learning evidence
+        run: PYTHONPATH=src python scripts/run_reflective_learning_evidence.py
+
       - name: Upload OpenAPI contract evidence
         uses: actions/upload-artifact@v4
         with:
@@ -162,6 +165,8 @@ jobs:
             build/arkaon-research-watch-evidence.json.sha256
             build/arkaon-experience-operations-audit.json
             build/arkaon-experience-operations-audit.json.sha256
+            build/arkaon-reflective-learning-evidence.json
+            build/arkaon-reflective-learning-evidence.json.sha256
 
       - name: Deterministic model invariant smoke seeds
         run: python tests/model_harness.py --profile smoke

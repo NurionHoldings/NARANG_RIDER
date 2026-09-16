@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-rc.6",
+  "version": "0.1.0-rc.8",
   "evidence": [
     {
       "id": "ci-269",
@@ -121,6 +121,20 @@
       "reference": "docs://29-professional-independent-review-packet"
     },
     {
+      "id": "map-knowledge-065",
+      "category": "map_knowledge_contract",
+      "digest": "0743f3d949d1d30ded3bd3d12132c1180df994cbd7a6446132f177b839db8164",
+      "status": "pass",
+      "reference": "src://narang_rider/map_integration.py"
+    },
+    {
+      "id": "mobile-navigation-066",
+      "category": "mobile_navigation_synthetic_matrix",
+      "digest": "b892b49ead66768219ba1d111d50c1f0b345236bae3e72000d227bfaddf98723",
+      "status": "pass",
+      "reference": "src://narang_rider/mobile_navigation.py"
+    },
+    {
       "id": "bugbot-054",
       "category": "external_bugbot_review",
       "digest": null,
@@ -144,6 +158,20 @@
       "category": "map_provider_sandbox",
       "digest": null,
       "status": "missing"
+    },
+    {
+      "id": "map-official-schemes",
+      "category": "map_official_scheme_validation",
+      "digest": null,
+      "status": "missing",
+      "reference": "github-issue://65"
+    },
+    {
+      "id": "map-physical-devices",
+      "category": "map_physical_device_certification",
+      "digest": null,
+      "status": "missing",
+      "reference": "github-issue://65"
     },
     {
       "id": "notifications",

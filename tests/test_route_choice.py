@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytest
+
 from narang_rider.route_choice import (
     AcceptedPay,
     HazardAdvisory,

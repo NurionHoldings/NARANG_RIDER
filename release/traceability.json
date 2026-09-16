@@ -12,7 +12,8 @@
     "domain:privacy", "api:privacy-rights", "db:privacy-rls", "ui:privacy-center", "test:privacy", "threat:idor",
     "domain:evidence", "api:evidence", "db:evidence-receipts", "ui:evidence-review", "test:evidence", "threat:photo-reuse",
     "domain:national-branches", "api:branch-control", "db:branch-rls", "ui:branch-ops", "test:branch-scope", "threat:cross-branch",
-    "domain:connectors", "api:partner-adapter", "db:connector-outbox", "ui:connector-status", "test:connector", "threat:duplicate-call"
+    "domain:connectors", "api:partner-adapter", "db:connector-outbox", "ui:connector-status", "test:connector", "threat:duplicate-call",
+    "domain:user-rights", "api:rights", "db:rights-audit", "ui:korean-accessibility", "test:accessibility", "threat:dark-pattern"
   ],
   "requirements": [
     {"id":"REQ-001","title":"안전과 법적 하한","domain":["domain:safety"],"api":["api:safety"],"db":["db:safety"],"frontend":["ui:safety"],"tests":["test:safety"],"threat_controls":["threat:safety"]},
@@ -25,6 +26,7 @@
     {"id":"REQ-008","title":"개인정보 생명주기","domain":["domain:privacy"],"api":["api:privacy-rights"],"db":["db:privacy-rls"],"frontend":["ui:privacy-center"],"tests":["test:privacy"],"threat_controls":["threat:idor"]},
     {"id":"REQ-009","title":"배송증거와 부정환불 방지","domain":["domain:evidence"],"api":["api:evidence"],"db":["db:evidence-receipts"],"frontend":["ui:evidence-review"],"tests":["test:evidence"],"threat_controls":["threat:photo-reuse"]},
     {"id":"REQ-010","title":"전국 지사 운영","domain":["domain:national-branches"],"api":["api:branch-control"],"db":["db:branch-rls"],"frontend":["ui:branch-ops"],"tests":["test:branch-scope"],"threat_controls":["threat:cross-branch"]},
-    {"id":"REQ-011","title":"기존 흐름 호환 커넥터","domain":["domain:connectors"],"api":["api:partner-adapter"],"db":["db:connector-outbox"],"frontend":["ui:connector-status"],"tests":["test:connector"],"threat_controls":["threat:duplicate-call"]}
+    {"id":"REQ-011","title":"기존 흐름 호환 커넥터","domain":["domain:connectors"],"api":["api:partner-adapter"],"db":["db:connector-outbox"],"frontend":["ui:connector-status"],"tests":["test:connector"],"threat_controls":["threat:duplicate-call"]},
+    {"id":"REQ-012","title":"한국어 접근성과 동등한 권리 선택","domain":["domain:user-rights"],"api":["api:rights"],"db":["db:rights-audit"],"frontend":["ui:korean-accessibility"],"tests":["test:accessibility"],"threat_controls":["threat:dark-pattern"]}
   ]
 }

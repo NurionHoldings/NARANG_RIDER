@@ -1,9 +1,10 @@
 """Validate external release blockers without reading external evidence bodies."""
 from __future__ import annotations
+
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +21,7 @@ def load_registry(path: Path | str) -> dict[str, Any]:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 def validate_registry(data: dict[str, Any], *, now: datetime | None = None) -> None:
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     blockers = data.get("blockers", [])
     ids = [item.get("id") for item in blockers]
     if ids != REQUIRED_IDS:
@@ -54,8 +55,8 @@ def _validate_verified(item: dict[str, Any], now: datetime) -> None:
         raise BlockerValidationError(f"{item['id']}: invalid evidence digest")
     if not REF_RE.fullmatch(item["ethernian_review_ref"]):
         raise BlockerValidationError(f"{item['id']}: unsafe Ethernian review reference")
-    expiry = datetime.fromisoformat(item["evidence_expires_at"].replace("Z", "+00:00"))
-    generated = datetime.fromisoformat(item["evidence_generated_at"].replace("Z", "+00:00"))
+    expiry = datetime.fromisoformat(item["evidence_expires_at"])
+    generated = datetime.fromisoformat(item["evidence_generated_at"])
     if expiry <= generated or expiry <= now:
         raise BlockerValidationError(f"{item['id']}: evidence expired")
     if item.get("operator_required") and not item.get("operator_approval_ref"):

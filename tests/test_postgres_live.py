@@ -8,6 +8,12 @@ from typing import Any
 
 import pytest
 
+from narang_rider.outbox_worker import (
+    DeliveryPolicy,
+    PermanentDeliveryError,
+    PostgresOutboxStore,
+    ReliableOutboxWorker,
+)
 from narang_rider.persistence import (
     ConcurrencyConflict,
     IdempotencyConflict,
@@ -326,3 +332,105 @@ def test_skip_locked_workers_never_lease_the_same_message() -> None:
     assert len(first_ids) == len(second_ids) == 3
     assert first_ids.isdisjoint(second_ids)
     assert len(first_ids | second_ids) == 6
+
+
+def test_postgres_reliable_workers_preserve_order_and_partner_isolation() -> None:
+    adapter = PostgresPersistence(connect)
+    for partner, stream, sequence in (
+        ("partner-a", "order-a", 2),
+        ("partner-a", "order-a", 1),
+        ("partner-b", "order-b", 1),
+    ):
+        message_id = f"{partner}-{sequence}"
+        unit = adapter.begin(
+            branch_id="sejong",
+            idempotency_key=message_id,
+            payload_digest=digest(message_id),
+        )
+        unit.put(
+            RecordKind.OUTBOX_MESSAGE,
+            message_id,
+            {
+                "branch_id": "sejong",
+                "partner_id": partner,
+                "stream_id": stream,
+                "sequence": sequence,
+                "event_type": "RIDER_STATUS",
+                "requires_ledger": False,
+            },
+            expected_version=0,
+        )
+        unit.commit()
+
+    class Transport:
+        def __init__(self) -> None:
+            self.calls: list[tuple[str, str]] = []
+
+        def send(self, *, partner_id: str, payload: Any, idempotency_key: str) -> None:
+            del payload
+            self.calls.append((partner_id, idempotency_key))
+
+    transport = Transport()
+    worker = ReliableOutboxWorker(
+        branch_id="sejong",
+        worker_id="live-worker",
+        store=PostgresOutboxStore(connect),
+        transport=transport,
+        policy=DeliveryPolicy(batch_size=10),
+    )
+    assert worker.run_once() == 2
+    assert worker.run_once() == 1
+    partner_a = [key for partner, key in transport.calls if partner == "partner-a"]
+    assert partner_a[0].endswith("partner-a-1")
+    assert partner_a[1].endswith("partner-a-2")
+
+
+def test_postgres_dead_letter_and_review_audit_are_atomic() -> None:
+    adapter = PostgresPersistence(connect)
+    unit = adapter.begin(
+        branch_id="sejong",
+        idempotency_key="dead-letter-message",
+        payload_digest=digest("dead-letter-message"),
+    )
+    unit.put(
+        RecordKind.OUTBOX_MESSAGE,
+        "dead-letter-message",
+        {
+            "branch_id": "sejong",
+            "partner_id": "partner-a",
+            "stream_id": "financial-order-1",
+            "sequence": 1,
+            "event_type": "FINANCIAL_STATUS",
+            "requires_ledger": False,
+        },
+        expected_version=0,
+    )
+    unit.commit()
+
+    class RejectingTransport:
+        def send(self, *, partner_id: str, payload: Any, idempotency_key: str) -> None:
+            del partner_id, payload, idempotency_key
+            raise PermanentDeliveryError("contract rejected")
+
+    worker = ReliableOutboxWorker(
+        branch_id="sejong",
+        worker_id="live-worker",
+        store=PostgresOutboxStore(connect),
+        transport=RejectingTransport(),
+    )
+    assert worker.run_once() == 0
+
+    with connect() as connection:
+        connection.execute("SELECT set_config('app.branch_id', %s, true)", ("sejong",))
+        outbox = connection.execute(
+            "SELECT delivered_at, dead_lettered_at FROM outbox_messages "
+            "WHERE branch_id = %s AND record_id = %s",
+            ("sejong", "dead-letter-message"),
+        ).fetchone()
+        audit = connection.execute(
+            "SELECT review_required, financial_adjustment_allowed "
+            "FROM outbox_review_events WHERE branch_id = %s AND message_id = %s",
+            ("sejong", "dead-letter-message"),
+        ).fetchone()
+    assert outbox[0] is None and outbox[1] is not None
+    assert audit == (True, False)

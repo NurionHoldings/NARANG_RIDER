@@ -17,7 +17,6 @@ from narang_rider.map_integration import (
     privacy_safe_launch_log,
 )
 
-
 NOW = datetime(2026, 9, 16, tzinfo=UTC)
 
 

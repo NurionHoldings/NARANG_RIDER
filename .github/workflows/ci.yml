@@ -52,18 +52,20 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_DB: narang_rider_test
-          POSTGRES_USER: narang_test
-          POSTGRES_PASSWORD: narang_test
+          POSTGRES_USER: narang_admin
+          POSTGRES_PASSWORD: narang_admin
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U narang_test -d narang_rider_test"
+          --health-cmd "pg_isready -U narang_admin -d narang_rider_test"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
     env:
+      NARANG_TEST_POSTGRES_ADMIN_DSN: >-
+        postgresql://narang_admin:narang_admin@127.0.0.1:5432/narang_rider_test
       NARANG_TEST_POSTGRES_DSN: >-
-        postgresql://narang_test:narang_test@127.0.0.1:5432/narang_rider_test
+        postgresql://narang_app:narang_app@127.0.0.1:5432/narang_rider_test
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

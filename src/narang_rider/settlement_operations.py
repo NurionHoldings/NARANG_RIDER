@@ -177,8 +177,8 @@ class SettlementOperations:
         self._statements: dict[str, SettlementStatement] = {}
         self._disputes: dict[str, Dispute] = {}
         self._instructions: dict[str, PayoutInstructionRecord] = {}
-        self._events: dict[str, str] = {}
-        self._last_sequence: dict[str, int] = {}
+        self._events: dict[tuple[str, str], str] = {}
+        self._last_sequence: dict[tuple[str, str], int] = {}
         self.audit: list[AuditEvent] = []
         self.outbox: list[OutboxEvent] = []
 
@@ -228,6 +228,13 @@ class SettlementOperations:
             raise ValueError("INVALID_DISPUTE")
         line = next((item for item in statement.lines if item.line_id == line_id), None)
         if line is None or disputed_won > line.gross_won - line.deduction_won:
+            raise ValueError("DISPUTE_EXCEEDS_LINE")
+        already_disputed = sum(
+            item.disputed_won
+            for item in self._disputes.values()
+            if item.statement_id == statement_id and item.line_id == line_id
+        )
+        if already_disputed + disputed_won > line.gross_won - line.deduction_won:
             raise ValueError("DISPUTE_EXCEEDS_LINE")
         dispute = Dispute(dispute_id, statement_id, line_id, disputed_won, owner_id, now)
         existing = self._disputes.get(dispute_id)
@@ -290,18 +297,22 @@ class SettlementOperations:
 
     def reconcile(self, *, event: ProviderPayoutEvent, branch_id: str) -> PayoutInstructionRecord:
         current = self._instruction(event.instruction_id, branch_id)
+        if current.status not in {InstructionStatus.SUBMITTED, InstructionStatus.CONFIRMED}:
+            raise SettlementRejected(SettlementErrorCode.DUTY_SEPARATION_REQUIRED)
         fingerprint = hashlib.sha256(repr(event).encode()).hexdigest()
-        if event.event_id in self._events:
-            if self._events[event.event_id] != fingerprint:
+        event_key = (branch_id, event.event_id)
+        if event_key in self._events:
+            if self._events[event_key] != fingerprint:
                 return self._review(current, "PROVIDER_REPLAY_CONFLICT")
             return current
-        self._events[event.event_id] = fingerprint
-        last = self._last_sequence.get(event.instruction_id, 0)
+        sequence_key = (branch_id, event.instruction_id)
+        last = self._last_sequence.get(sequence_key, 0)
         if (not self._verifier.verify(event) or event.sequence != last + 1
                 or event.amount_won != current.amount_won
                 or event.destination_vault_ref != current.destination_vault_ref):
             return self._review(current, "PROVIDER_CALLBACK_MISMATCH")
-        self._last_sequence[event.instruction_id] = event.sequence
+        self._events[event_key] = fingerprint
+        self._last_sequence[sequence_key] = event.sequence
         updated = replace(current, status=InstructionStatus.CONFIRMED,
                           provider_reference=event.provider_reference)
         self._instructions[event.instruction_id] = updated

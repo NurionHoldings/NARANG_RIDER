@@ -403,6 +403,16 @@ class RiderWorkflowService:
             "estimated_net_won": assignment.payload["estimated_net_won"],
             "append_only": True,
             "evidence_receipt_ref": evidence_receipt_ref,
+            "entries": [
+                {
+                    "account_code": "RIDER_EARNING_EXPENSE",
+                    "amount_won": assignment.payload["rider_pay_won"],
+                },
+                {
+                    "account_code": "RIDER_PAYABLE",
+                    "amount_won": -assignment.payload["rider_pay_won"],
+                },
+            ],
         }
         receipt = self._commit(
             context,

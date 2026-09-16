@@ -25,6 +25,10 @@ Send = Callable[[Message], Awaitable[None]]
 _REQUEST_ID = re.compile(r"^[A-Za-z0-9._:-]{1,128}$")
 _METHOD = re.compile(r"^[A-Z]{3,12}$")
 _REDACTED_HEADERS = {"authorization", "cookie", "proxy-authorization", "set-cookie"}
+_SINGLETON_HEADERS = {
+    "authorization", "content-length", "content-type", "cookie", "host",
+    "idempotency-key", "x-branch-id", "x-csrf-token",
+}
 
 
 class StructuredLogger(Protocol):
@@ -107,7 +111,14 @@ class NarangAsgiApp:
 
     async def _http(self, scope: Scope, receive: Receive, send: Send) -> None:
         started = time.monotonic()
-        headers = self._headers(scope)
+        try:
+            headers = self._headers(scope)
+        except InvalidHeaders:
+            request_id = uuid.uuid4().hex
+            await self._send_response(
+                send, self._error(400, "AMBIGUOUS_HEADERS", request_id), request_id
+            )
+            return
         request_id = self._request_id(headers)
         method = str(scope.get("method", "")).upper()
         path = str(scope.get("path", ""))
@@ -205,7 +216,10 @@ class NarangAsgiApp:
             except (AttributeError, UnicodeDecodeError):
                 continue
             canonical = "-".join(piece.capitalize() for piece in name.split("-"))
-            if canonical.lower() in _REDACTED_HEADERS or canonical not in result:
+            lowered = canonical.lower()
+            if lowered in _SINGLETON_HEADERS and canonical in result:
+                raise InvalidHeaders
+            if lowered in _REDACTED_HEADERS or canonical not in result:
                 result[canonical] = value
         return result
 
@@ -256,4 +270,8 @@ class BodyTooLarge(RuntimeError):
 
 
 class ClientDisconnected(RuntimeError):
+    pass
+
+
+class InvalidHeaders(RuntimeError):
     pass

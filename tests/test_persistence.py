@@ -30,7 +30,13 @@ def _stage_financial_bundle(unit, suffix: str = "1") -> None:
     unit.put(
         RecordKind.LEDGER_TRANSACTION,
         f"ledger-{suffix}",
-        {"branch_id": BRANCH, "balanced": True, "amount_krw": 4_000},
+        {
+            "branch_id": BRANCH,
+            "entries": [
+                {"account_code": "RIDER_EARNING_EXPENSE", "amount_won": 4_000},
+                {"account_code": "RIDER_PAYABLE", "amount_won": -4_000},
+            ],
+        },
         expected_version=0,
     )
     unit.put(
@@ -247,7 +253,10 @@ def test_ledger_cannot_commit_without_outbox() -> None:
     unit.put(
         RecordKind.LEDGER_TRANSACTION,
         "ledger-1",
-        {"branch_id": BRANCH, "balanced": True},
+        {"branch_id": BRANCH, "entries": [
+            {"account_code": "RIDER_EARNING_EXPENSE", "amount_won": 1},
+            {"account_code": "RIDER_PAYABLE", "amount_won": -1},
+        ]},
         expected_version=0,
     )
     with pytest.raises(AtomicityViolation):

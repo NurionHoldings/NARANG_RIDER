@@ -41,6 +41,10 @@ class AtomicityViolation(PersistenceError):
     """Financial records were not staged with their required counterpart."""
 
 
+class LedgerIntegrityViolation(PersistenceError):
+    """A persisted ledger payload is not a balanced signed double entry."""
+
+
 class SimulatedCrash(PersistenceError):
     """Reference-adapter fault used to prove rollback behavior."""
 
@@ -131,6 +135,34 @@ def canonical_payload_digest(payload: Mapping[str, Any]) -> str:
 
     canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode()).hexdigest()
+
+
+def validate_ledger_payload(payload: Mapping[str, Any]) -> None:
+    """Validate the storage representation, independently of domain constructors.
+
+    Ledger entries use a signed amount: positive is debit and negative is credit.
+    This boundary is necessary because adapters can be called without constructing a
+    :class:`LedgerTransaction` first.
+    """
+
+    entries = payload.get("entries")
+    if not isinstance(entries, list) or len(entries) < 2:
+        raise LedgerIntegrityViolation("ledger requires at least two entries")
+    total = 0
+    for entry in entries:
+        if not isinstance(entry, Mapping) or set(entry) != {"account_code", "amount_won"}:
+            raise LedgerIntegrityViolation("ledger entry shape is invalid")
+        account = entry["account_code"]
+        amount = entry["amount_won"]
+        if not isinstance(account, str) or not account.strip() or len(account) > 128:
+            raise LedgerIntegrityViolation("ledger account is invalid")
+        if not isinstance(amount, int) or isinstance(amount, bool) or amount == 0:
+            raise LedgerIntegrityViolation("ledger amount must be a non-zero integer")
+        if not -(2**63) < amount < 2**63:
+            raise LedgerIntegrityViolation("ledger amount is outside bigint bounds")
+        total += amount
+    if total != 0:
+        raise LedgerIntegrityViolation("ledger transaction is unbalanced")
 
 
 def _validate_no_raw_pii(value: Any, path: str = "payload") -> None:
@@ -233,6 +265,8 @@ class _InMemoryUnitOfWork:
         if expected_version is not None and expected_version < 0:
             raise ValueError("expected_version cannot be negative")
         _validate_no_raw_pii(payload)
+        if kind is RecordKind.LEDGER_TRANSACTION:
+            validate_ledger_payload(payload)
         payload_branch = payload.get("branch_id")
         if payload_branch is not None and payload_branch != self._branch_id:
             raise TenantScopeError("cross-branch write denied")

@@ -220,3 +220,19 @@ def test_startup_refuses_missing_database_or_jwks_config_references() -> None:
         create_runtime(RuntimeConfig("", "config://jwks"), dependencies)
     with pytest.raises(RuntimeError):
         create_runtime(RuntimeConfig("config://db", "raw-secret"), dependencies)
+
+
+@async_test
+async def test_duplicate_security_headers_are_rejected_before_handler() -> None:
+    handler = Handler()
+    app = create_test_runtime(handler)
+    for name in (b"authorization", b"content-length", b"x-branch-id", b"idempotency-key"):
+        sent = await invoke(
+            app,
+            scope(headers=[(name, b"first"), (name, b"second")]),
+            [{"type": "http.request", "body": b"", "more_body": False}],
+        )
+        start, body = response(sent)
+        assert start["status"] == 400
+        assert body["error"]["code"] == "AMBIGUOUS_HEADERS"
+    assert handler.requests == []

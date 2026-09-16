@@ -155,7 +155,10 @@ def test_financial_write_requires_ledger_and_outbox_in_same_transaction() -> Non
     unit.put(
         RecordKind.LEDGER_TRANSACTION,
         "tx",
-        {"branch_id": "b", "entries": []},
+        {"branch_id": "b", "entries": [
+            {"account_code": "EXPENSE", "amount_won": 1},
+            {"account_code": "PAYABLE", "amount_won": -1},
+        ]},
         expected_version=0,
     )
     with pytest.raises(AtomicityViolation):

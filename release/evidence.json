@@ -246,6 +246,18 @@
       "category": "location_professional_approval",
       "digest": null,
       "status": "missing"
+    },
+    {
+      "id": "closed-sandbox-tabletop",
+      "category": "closed_sandbox_and_tabletop",
+      "digest": null,
+      "status": "missing"
+    },
+    {
+      "id": "assistive-tech",
+      "category": "assistive_technology_test",
+      "digest": null,
+      "status": "missing"
     }
   ]
 }

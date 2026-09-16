@@ -1,9 +1,11 @@
 """Read-only operator view for external release blockers."""
 from __future__ import annotations
+
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
 from scripts.validate_external_blockers import load_registry, registry_digest, validate_registry
 
 DEFAULT_REGISTRY = Path(__file__).resolve().parents[2] / "config" / "external-blockers.json"
@@ -40,7 +42,7 @@ def build_operator_dashboard(path: Path | str = DEFAULT_REGISTRY) -> ExternalRea
         in_progress=statuses.count("IN_PROGRESS"),
         next_action_ids=tuple(actionable),
         registry_digest=registry_digest(data),
-        generated_at=datetime.now(timezone.utc).isoformat(),
+        generated_at=datetime.now(UTC).isoformat(),
     )
 
 def external_readiness_api(path: Path | str = DEFAULT_REGISTRY) -> dict[str, Any]:

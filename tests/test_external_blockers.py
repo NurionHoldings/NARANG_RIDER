@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from narang_rider.external_readiness import build_operator_dashboard, external_readiness_api
 from narang_rider.external_blockers import (
     BlockerValidationError,
     load_registry,
     validate_registry,
 )
+from narang_rider.external_readiness import build_operator_dashboard, external_readiness_api
 
 REGISTRY = Path("config/external-blockers.json")
 

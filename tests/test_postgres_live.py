@@ -18,7 +18,8 @@ from narang_rider.postgres import PostgresPersistence
 
 psycopg = pytest.importorskip("psycopg")
 DSN = os.environ.get("NARANG_TEST_POSTGRES_DSN")
-if not DSN:
+ADMIN_DSN = os.environ.get("NARANG_TEST_POSTGRES_ADMIN_DSN")
+if not DSN or not ADMIN_DSN:
     pytest.skip("live PostgreSQL is only enabled by the dedicated CI job", allow_module_level=True)
 
 UP = Path("migrations/0001_postgres_persistence.sql").read_text()
@@ -30,14 +31,34 @@ def connect() -> Any:
 
 
 def migrate(sql: str) -> None:
-    with psycopg.connect(DSN, autocommit=True) as connection:
+    with psycopg.connect(ADMIN_DSN, autocommit=True) as connection:
         connection.execute(sql)
+
+
+def ensure_application_role() -> None:
+    with psycopg.connect(ADMIN_DSN, autocommit=True) as connection:
+        exists = connection.execute(
+            "SELECT 1 FROM pg_roles WHERE rolname = 'narang_app'"
+        ).fetchone()
+        if exists is None:
+            connection.execute("CREATE ROLE narang_app LOGIN PASSWORD 'narang_app'")
+
+
+def grant_application_access() -> None:
+    with psycopg.connect(ADMIN_DSN, autocommit=True) as connection:
+        connection.execute("GRANT USAGE ON SCHEMA public TO narang_app")
+        connection.execute(
+            "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public "
+            "TO narang_app"
+        )
 
 
 @pytest.fixture(autouse=True)
 def fresh_schema() -> None:
+    ensure_application_role()
     migrate(DOWN)
     migrate(UP)
+    grant_application_access()
 
 
 def digest(command: str) -> str:
@@ -73,8 +94,10 @@ def create_order(
 def test_migration_fresh_down_up_is_repeatable() -> None:
     migrate(DOWN)
     migrate(UP)
+    grant_application_access()
     migrate(DOWN)
     migrate(UP)
+    grant_application_access()
     with connect() as connection:
         version = connection.execute("SELECT version FROM schema_migrations").fetchone()
     assert version == (1,)

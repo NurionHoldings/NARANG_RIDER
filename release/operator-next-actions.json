@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "release": "0.1.0-rc.6",
+  "release": "0.1.0-rc.7",
   "verdict": "BLOCKED",
   "generated_for": "operator_review_only",
   "actions": [
@@ -16,7 +16,9 @@
         "Vault 자격증명 참조"
       ],
       "expiry": "공급자 문서 만료일 또는 90일 중 빠른 날",
-      "blocker": "partner_official_api"
+      "blocker": "partner_official_api",
+      "issue_number": 64,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/64"
     },
     {
       "order": 2,
@@ -30,7 +32,9 @@
         "선정 서명참조"
       ],
       "expiry": "가격·계약·재위탁자 변경 시",
-      "blocker": "production_infrastructure"
+      "blocker": "production_infrastructure",
+      "issue_number": 65,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/65"
     },
     {
       "order": 3,
@@ -46,7 +50,9 @@
         "위치 분야별 서명의견 참조"
       ],
       "expiry": "시스템·법령·계약 변경 또는 의견 만료 시",
-      "blocker": "legal_counsel_approval"
+      "blocker": "legal_counsel_approval",
+      "issue_number": 66,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/66"
     },
     {
       "order": 4,
@@ -60,7 +66,9 @@
         "비운영 네트워크·RLS 증거"
       ],
       "expiry": "구성·키·이미지 변경 시",
-      "blocker": "production_secret_provisioning"
+      "blocker": "production_secret_provisioning",
+      "issue_number": 67,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/67"
     },
     {
       "order": 5,
@@ -74,7 +82,9 @@
         "실제 보조기기 시험 보고서"
       ],
       "expiry": "UI·런타임·런북 변경 시",
-      "blocker": "closed_sandbox_and_tabletop"
+      "blocker": "closed_sandbox_and_tabletop",
+      "issue_number": 68,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/68"
     },
     {
       "order": 6,
@@ -88,7 +98,9 @@
         "안전·경제성·개인정보 결과"
       ],
       "expiry": "파일럿 종료 또는 범위 확대 전",
-      "blocker": "field_pilot"
+      "blocker": "field_pilot",
+      "issue_number": 69,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/69"
     },
     {
       "order": 7,
@@ -102,7 +114,9 @@
         "서명된 운영자 승인"
       ],
       "expiry": "HEAD·의존성·외부 계약 변경 시 즉시",
-      "blocker": "operator_approval"
+      "blocker": "operator_approval",
+      "issue_number": 70,
+      "issue_url": "https://github.com/NurionHoldings/NARANG_RIDER/issues/70"
     }
   ]
 }

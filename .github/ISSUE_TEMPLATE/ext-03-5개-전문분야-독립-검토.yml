@@ -1,0 +1,47 @@
+name: "EXT-03 5개 전문분야 독립 검토"
+description: "외부 출시 차단조건을 비밀·개인정보 없이 추적합니다."
+title: "[EXT-03] 5개 전문분야 독립 검토"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        상태 변경은 config/external-blockers.json PR로 수행합니다. 이 Issue 자체는 완료 증거가 아니며 자동 종료·출시하지 않습니다.
+  - type: dropdown
+    id: status
+    attributes:
+      label: 상태
+      options: [PENDING, IN_PROGRESS, BLOCKED]
+    validations: {required: true}
+  - type: input
+    id: owner_role
+    attributes:
+      label: 담당 역할
+      value: "INDEPENDENT_REVIEW_COORDINATOR"
+    validations: {required: true}
+  - type: textarea
+    id: progress
+    attributes:
+      label: 진행 내용
+      description: 비밀정보와 개인정보를 입력하지 마십시오.
+    validations: {required: true}
+  - type: input
+    id: evidence_ref
+    attributes:
+      label: 보안 증거 참조
+      description: "evidence-ref:, vault-ref: 또는 sha256: 참조만 허용합니다. 원문 비밀·개인정보 금지."
+      placeholder: "evidence-ref:..."
+  - type: input
+    id: expires_at
+    attributes:
+      label: 증거 만료일
+      description: "ISO 8601 UTC. VERIFIED 변경은 별도 PR 검증이 필요합니다."
+      placeholder: "YYYY-MM-DDTHH:MM:SSZ"
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 안전 확인
+      options:
+        - label: "API 키·토큰·비밀번호·인증서·개인정보·실제 위치/결제정보를 입력하지 않았습니다."
+          required: true
+        - label: "이 Issue를 닫는 행위가 출시·병합·배포 승인을 의미하지 않음을 확인합니다."
+          required: true

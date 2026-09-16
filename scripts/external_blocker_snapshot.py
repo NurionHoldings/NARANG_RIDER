@@ -1,16 +1,15 @@
-#!/usr/bin/env python3
 """Generate a non-sensitive weekly blocker snapshot."""
 from __future__ import annotations
 
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.validate_external_blockers import (  # noqa: E402
+from scripts.validate_external_blockers import (
     load_registry,
     registry_digest,
     validate_registry,
@@ -25,7 +24,7 @@ def main() -> int:
     data = load_registry(args.registry)
     validate_registry(data)
     output = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "release_gate": data["release_gate"],
         "registry_digest": registry_digest(data),
         "blockers": [

@@ -141,7 +141,8 @@ def test_atomic_order_bundle_uses_bound_values_and_commits_once() -> None:
     assert connection.rollbacks == 0
     assert receipt.versions == (1, 1, 1)
     assert all("sejong-1" not in query for query, _ in connection.db_cursor.executions)
-    assert any("SET LOCAL app.branch_id = %s" in query for query, _ in connection.db_cursor.executions)
+    assert any("set_config('app.branch_id', %s, true)" in query
+               for query, _ in connection.db_cursor.executions)
     assert any(params == ("sejong-1",) for _, params in connection.db_cursor.executions)
 
 
@@ -219,7 +220,8 @@ def test_outbox_lease_is_bounded_and_uses_skip_locked() -> None:
 
 @pytest.mark.parametrize(
     ("sqlstate", "error_type"),
-    [("23505", ConcurrencyConflict), ("40001", ConcurrencyConflict),
+    [("23503", ConcurrencyConflict), ("23505", ConcurrencyConflict),
+     ("40001", ConcurrencyConflict),
      ("42501", TenantScopeError), ("08006", DatabaseUnavailable)],
 )
 def test_database_errors_have_stable_non_secret_mapping(

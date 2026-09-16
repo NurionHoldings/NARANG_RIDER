@@ -99,8 +99,8 @@ def _json_object(payload: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
 
 def _translate_database_error(error: Exception) -> PersistenceError:
     code = getattr(error, "sqlstate", None) or getattr(error, "pgcode", None)
-    if code == "23505":
-        return ConcurrencyConflict("unique storage constraint rejected the write")
+    if code in {"23503", "23505"}:
+        return ConcurrencyConflict("storage constraint rejected the write")
     if code == "40001":
         return ConcurrencyConflict("database serialization conflict")
     if code == "42501":
@@ -130,7 +130,7 @@ class PostgresPersistence:
         connection = self._connection_factory()
         try:
             cursor = connection.cursor()
-            cursor.execute("SET LOCAL app.branch_id = %s", (branch_id,))
+            cursor.execute("SELECT set_config('app.branch_id', %s, true)", (branch_id,))
             cursor.execute(
                 f"SELECT payload, version FROM {_TABLES[kind]} "
                 "WHERE branch_id = %s AND record_id = %s",
@@ -165,7 +165,7 @@ class PostgresPersistence:
         lease_until = datetime.now(UTC) + timedelta(seconds=lease_seconds)
         try:
             cursor = connection.cursor()
-            cursor.execute("SET LOCAL app.branch_id = %s", (branch_id,))
+            cursor.execute("SELECT set_config('app.branch_id', %s, true)", (branch_id,))
             cursor.execute(
                 """WITH candidates AS (
                     SELECT branch_id, record_id FROM outbox_messages
@@ -267,7 +267,7 @@ class _PostgresUnitOfWork:
     def _commit_transaction(self) -> PersistenceAuditReceipt:
         cursor = self._connection.cursor()
         cursor.execute("SET TRANSACTION ISOLATION LEVEL SERIALIZABLE")
-        cursor.execute("SET LOCAL app.branch_id = %s", (self._branch_id,))
+        cursor.execute("SELECT set_config('app.branch_id', %s, true)", (self._branch_id,))
         cursor.execute(
             "SELECT payload_digest, commit_id, audit_hash, record_refs, versions "
             "FROM idempotency_records WHERE branch_id = %s AND idempotency_key = %s "

@@ -91,6 +91,12 @@ jobs:
       - name: Bounded synthetic load and abuse simulation
         run: python scripts/run_synthetic_simulation.py --profile smoke > synthetic-simulation-report.json
 
+      - name: Partner sandbox contracts (generic and provisional profiles)
+        run: |-
+          PYTHONPATH=src python scripts/certify_partner_sandbox.py --profile generic-platform > partner-generic.json
+          PYTHONPATH=src python scripts/certify_partner_sandbox.py --profile ai-baebi > partner-ai-baebi.json
+          PYTHONPATH=src python scripts/certify_partner_sandbox.py --profile dosirak-store > partner-dosirak-store.json
+
       - name: Whitespace errors
         run: git diff --check
 

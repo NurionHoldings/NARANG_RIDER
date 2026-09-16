@@ -66,6 +66,13 @@ from .payments import (
     PayoutInstructionService,
     ProviderPaymentEvent,
 )
+from .rollout import (
+    ArkaonRelease,
+    ArkaonRolloutController,
+    BranchDeployment,
+    OutputAuthority,
+    RolloutStage,
+)
 from .pricing import DeliveryFacts, MerchantOrderEconomics, PricingPolicy, PublicQuote
 
 __all__ = [
@@ -78,10 +85,13 @@ __all__ = [
     "ArkaonDevelopmentCoordinator",
     "ArkaonEvolutionRegistry",
     "ArkaonProfile",
+    "ArkaonRelease",
+    "ArkaonRolloutController",
     "Assignment",
     "AssignmentStatus",
     "Branch",
     "BranchAccuracy",
+    "BranchDeployment",
     "BranchLedgerAllocation",
     "BranchRegistry",
     "BranchScopeAuthorizer",
@@ -117,6 +127,7 @@ __all__ = [
     "OrderEvent",
     "OrderRepository",
     "OrderState",
+    "OutputAuthority",
     "PaymentEventType",
     "PaymentRecord",
     "PaymentState",
@@ -133,6 +144,7 @@ __all__ = [
     "QuoteRepository",
     "QuoteSnapshot",
     "ResourceKind",
+    "RolloutStage",
     "ScopedPrincipal",
     "ServiceArea",
     "detect_error_drift",

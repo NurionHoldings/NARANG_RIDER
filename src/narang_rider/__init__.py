@@ -157,8 +157,10 @@ from .operations import (
     Merchant,
     OrderChannel,
     OrderIntakeService,
-    RiderAvailability,
     RiderAvailabilityService,
+)
+from .operations import (
+    RiderAvailability as RiderAvailabilityMode,
 )
 from .outbox_worker import (
     DeliveryEnvelope,
@@ -204,6 +206,21 @@ from .postgres import (
     SerializationRejected,
 )
 from .pricing import DeliveryFacts, MerchantOrderEconomics, PricingPolicy, PublicQuote
+from .rider_workflow import (
+    RIDER_ROUTE_MANIFEST,
+    DeliveryStatus,
+    FairOfferView,
+    ProofCaptureGrant,
+    RiderAvailability,
+    RiderCapability,
+    RiderCommandRejected,
+    RiderContext,
+    RiderErrorCode,
+    RiderOfferStatus,
+    RiderReceipt,
+    RiderRouteContract,
+    RiderWorkflowService,
+)
 from .rollout import (
     ArkaonRelease,
     ArkaonRolloutController,
@@ -223,6 +240,7 @@ from .runtime import (
 __all__ = [
     "MAX_REQUEST_BYTES",
     "MERCHANT_ROUTE_MANIFEST",
+    "RIDER_ROUTE_MANIFEST",
     "ROUTE_MANIFEST",
     "AccuracyObservation",
     "AccuracyPolicy",
@@ -281,6 +299,7 @@ __all__ = [
     "DeliveryFacts",
     "DeliveryMetric",
     "DeliveryPolicy",
+    "DeliveryStatus",
     "DependencyHealth",
     "DispatchCandidate",
     "DispatchReceipt",
@@ -293,6 +312,7 @@ __all__ = [
     "EvidenceStage",
     "EvolutionCandidate",
     "FairDispatchPolicy",
+    "FairOfferView",
     "FakeAuthContextVerifier",
     "ForbiddenAuthority",
     "HttpRequest",
@@ -369,6 +389,7 @@ __all__ = [
     "PrincipalRecord",
     "PrincipalRole",
     "PrivacySafeMetricsRegistry",
+    "ProofCaptureGrant",
     "ProviderPaymentEvent",
     "PublicQuote",
     "PublicQuoteSnapshot",
@@ -390,8 +411,17 @@ __all__ = [
     "RetryableDeliveryError",
     "ReviewAuditEvent",
     "RiderAvailability",
+    "RiderAvailabilityMode",
     "RiderAvailabilityService",
     "RiderCallRoute",
+    "RiderCapability",
+    "RiderCommandRejected",
+    "RiderContext",
+    "RiderErrorCode",
+    "RiderOfferStatus",
+    "RiderReceipt",
+    "RiderRouteContract",
+    "RiderWorkflowService",
     "RolloutStage",
     "RouteContract",
     "RuntimeConfig",

@@ -300,6 +300,48 @@
       "digest": "c8aa500fd3ba7f59e50974a9e21616bbdc69994972e240366c2dfbf73c6a89e2",
       "status": "pass",
       "reference": "src://narang_rider/map_release_gate.py"
+    },
+    {
+      "id": "map-knowledge-065",
+      "category": "map_knowledge_contract",
+      "digest": "0743f3d949d1d30ded3bd3d12132c1180df994cbd7a6446132f177b839db8164",
+      "status": "pass",
+      "reference": "src://narang_rider/map_integration.py"
+    },
+    {
+      "id": "mobile-navigation-066",
+      "category": "mobile_navigation_synthetic_matrix",
+      "digest": "b892b49ead66768219ba1d111d50c1f0b345236bae3e72000d227bfaddf98723",
+      "status": "pass",
+      "reference": "src://narang_rider/mobile_navigation.py"
+    },
+    {
+      "id": "route-safety-068",
+      "category": "route_choice_safety_cost",
+      "digest": "79223bffa71ea8dd55fb14d42cf24f8abfe8e1de7485867854b173005764899d",
+      "status": "pass",
+      "reference": "src://narang_rider/route_choice.py"
+    },
+    {
+      "id": "map-competency-069",
+      "category": "arkaon_map_competency",
+      "digest": "6ac88002ad5ca515d0cf1855c951b13216d44347c28f8dc13f966d1db6256e72",
+      "status": "pass",
+      "reference": "src://narang_rider/map_competency.py"
+    },
+    {
+      "id": "map-official-schemes",
+      "category": "map_official_scheme_validation",
+      "digest": null,
+      "status": "missing",
+      "reference": "github-issue://65"
+    },
+    {
+      "id": "map-physical-devices",
+      "category": "map_physical_device_certification",
+      "digest": null,
+      "status": "missing",
+      "reference": "github-issue://65"
     }
   ]
 }

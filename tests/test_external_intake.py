@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -12,7 +12,7 @@ from narang_rider.external_intake import (
     operator_checklist,
 )
 
-NOW = datetime(2026, 9, 16, tzinfo=timezone.utc)
+NOW = datetime(2026, 9, 16, tzinfo=UTC)
 
 
 def evidence(**changes):

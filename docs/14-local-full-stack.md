@@ -6,7 +6,7 @@
 
 ```bash
 docker compose -f compose.local.yml up --build --wait
-python scripts/local_full_stack_smoke.py
+docker compose -f compose.local.yml exec -T app python scripts/local_full_stack_smoke.py --base-url http://127.0.0.1:8000 --output /tmp/local-full-stack-report.json
 docker compose -f compose.local.yml down --volumes --remove-orphans
 ```
 
@@ -14,7 +14,7 @@ docker compose -f compose.local.yml down --volumes --remove-orphans
 
 ```powershell
 docker compose -f compose.local.yml up --build --wait
-python .\scripts\local_full_stack_smoke.py
+docker compose -f compose.local.yml exec -T app python scripts/local_full_stack_smoke.py --base-url http://127.0.0.1:8000 --output /tmp/local-full-stack-report.json
 docker compose -f compose.local.yml down --volumes --remove-orphans
 ```
 

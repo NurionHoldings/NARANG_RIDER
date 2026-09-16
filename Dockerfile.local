@@ -4,6 +4,7 @@ RUN groupadd --gid 10001 narang && useradd --uid 10001 --gid 10001 --no-create-h
 WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY src ./src
+COPY scripts ./scripts
 RUN python -m pip install --no-cache-dir "uvicorn==0.30.6" ./
 USER 10001:10001
 CMD ["python", "-m", "narang_rider.local_stack"]

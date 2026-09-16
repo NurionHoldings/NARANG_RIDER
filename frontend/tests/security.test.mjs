@@ -38,3 +38,11 @@ test("notification center keeps lockscreen payload minimal and rights intact", (
   assert.match(app, /잠금화면에는 주소·정밀위치·라이더 정보·주문내용을 표시하지 않습니다/);
   assert.match(app, /환불·이의제기 등 권리를 제한하지 않습니다/);
 });
+
+test("map-free route status protects location and ARKAON advice boundaries", () => {
+  assert.match(app, /정밀위치나 라이더 정보 없이 대략적인 진행상태만 확인합니다/);
+  assert.match(app, /주소와 정밀위치는 표시하거나 저장하지 않습니다/);
+  assert.match(app, /보수에 불리하지 않은 보수적 공개견적/);
+  assert.match(app, /배차 배제·보수 삭감·제재의 근거가 아닙니다/);
+  assert.match(app, /우회 주행만으로 과실을 판단하지 않습니다/);
+});

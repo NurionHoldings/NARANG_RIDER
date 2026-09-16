@@ -1,0 +1,11 @@
+BEGIN;
+DROP TABLE IF EXISTS audit_receipts;
+DROP TABLE IF EXISTS idempotency_records;
+DROP TABLE IF EXISTS outbox_messages;
+DROP TABLE IF EXISTS ledger_entries;
+DROP TABLE IF EXISTS ledger_transactions;
+DROP TABLE IF EXISTS rider_calls;
+DROP TABLE IF EXISTS partner_events;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS schema_migrations;
+COMMIT;

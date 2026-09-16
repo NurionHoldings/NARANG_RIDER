@@ -141,6 +141,12 @@ from .persistence import (
     TenantScopeError,
     canonical_payload_digest,
 )
+from .postgres import (
+    DatabaseUnavailable,
+    OutboxLease,
+    PostgresPersistence,
+    SerializationRejected,
+)
 from .pricing import DeliveryFacts, MerchantOrderEconomics, PricingPolicy, PublicQuote
 from .rollout import (
     ArkaonRelease,
@@ -196,6 +202,7 @@ __all__ = [
     "CommandContext",
     "ConcurrencyConflict",
     "CorridorRegistry",
+    "DatabaseUnavailable",
     "DeliveryEvidenceBundle",
     "DeliveryExecutionService",
     "DeliveryFacts",
@@ -245,6 +252,7 @@ __all__ = [
     "OrderIntakeService",
     "OrderRepository",
     "OrderState",
+    "OutboxLease",
     "OutputAuthority",
     "PartnerFeeReport",
     "PaymentEventType",
@@ -257,6 +265,7 @@ __all__ = [
     "PayoutInstructionService",
     "PersistenceAuditReceipt",
     "PersistenceError",
+    "PostgresPersistence",
     "PredictionDisposition",
     "PricingPolicy",
     "PrincipalRole",
@@ -277,6 +286,7 @@ __all__ = [
     "RouteContract",
     "ScopedPrincipal",
     "SensitiveDataRejected",
+    "SerializationRejected",
     "ServiceArea",
     "SimulatedCrash",
     "StoredRecord",

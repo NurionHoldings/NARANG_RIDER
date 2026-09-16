@@ -19,7 +19,6 @@ from narang_rider.casework import (
     ParticipantRole,
 )
 
-
 NOW = datetime(2026, 9, 16, tzinfo=UTC)
 
 

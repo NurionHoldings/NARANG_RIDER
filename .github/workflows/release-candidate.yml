@@ -36,7 +36,7 @@ jobs:
         run: python -c "import json; assert json.load(open('build/release-candidate-report.json'))['verdict'] == 'BLOCKED'"
       - uses: actions/upload-artifact@v4
         with:
-          name: release-candidate-0.1.0-rc.1
+          name: release-candidate-0.1.0-rc.3
           path: build/release-candidate-report.json
           if-no-files-found: error
           retention-days: 30

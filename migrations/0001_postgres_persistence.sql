@@ -78,6 +78,8 @@ CREATE TABLE outbox_messages (
     lease_owner text,
     lease_until timestamptz,
     delivered_at timestamptz,
+    dead_lettered_at timestamptz,
+    failure_code text,
     attempts integer NOT NULL DEFAULT 0 CHECK (attempts >= 0),
     created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
     updated_at timestamptz NOT NULL DEFAULT clock_timestamp(),
@@ -87,6 +89,21 @@ CREATE TABLE outbox_messages (
 CREATE INDEX outbox_delivery_idx
     ON outbox_messages (branch_id, available_at, created_at)
     WHERE delivered_at IS NULL;
+
+CREATE TABLE outbox_review_events (
+    branch_id text NOT NULL,
+    message_id text NOT NULL,
+    event_sequence bigint GENERATED ALWAYS AS IDENTITY,
+    partner_id text NOT NULL,
+    reason_code text NOT NULL,
+    review_required boolean NOT NULL DEFAULT true CHECK (review_required),
+    financial_adjustment_allowed boolean NOT NULL DEFAULT false
+        CHECK (NOT financial_adjustment_allowed),
+    created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+    PRIMARY KEY (branch_id, message_id, event_sequence),
+    FOREIGN KEY (branch_id, message_id)
+        REFERENCES outbox_messages (branch_id, record_id) ON DELETE RESTRICT
+);
 
 CREATE TABLE idempotency_records (
     branch_id text NOT NULL,
@@ -122,7 +139,8 @@ DECLARE table_name text;
 BEGIN
     FOREACH table_name IN ARRAY ARRAY[
         'orders', 'partner_events', 'rider_calls', 'ledger_transactions',
-        'ledger_entries', 'outbox_messages', 'idempotency_records', 'audit_receipts'
+        'ledger_entries', 'outbox_messages', 'outbox_review_events',
+        'idempotency_records', 'audit_receipts'
     ]
     LOOP
         EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', table_name);

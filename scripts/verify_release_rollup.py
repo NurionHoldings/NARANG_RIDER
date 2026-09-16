@@ -26,10 +26,10 @@ def main() -> int:
     actions = json.loads(Path(args.actions).read_text(encoding="utf-8"))
     failures: list[str] = []
 
-    expected_prs = list(range(1, 62))
+    expected_prs = list(range(1, 64))
     if manifest["included_pull_requests"] != expected_prs:
-        failures.append("included PRs must be the contiguous range 1..61")
-    if manifest["version"] != "0.1.0-rc.6" or manifest["purpose"] != "REVIEW_ONLY":
+        failures.append("included PRs must be the contiguous range 1..63")
+    if manifest["version"] != "0.1.0-rc.7" or manifest["purpose"] != "REVIEW_ONLY":
         failures.append("rollup identity or purpose mismatch")
     if manifest["release_verdict"] != "BLOCKED":
         failures.append("rollup release verdict must remain BLOCKED")
@@ -53,8 +53,8 @@ def main() -> int:
     if merge_commits.returncode or merge_commits.stdout.strip():
         failures.append("rollup history contains merge commits or cannot be inspected")
     commit_count = git("rev-list", "--count", f"{main_commit}..{args.head}")
-    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 61:
-        failures.append("rollup history is unexpectedly short for PRs 1..61")
+    if commit_count.returncode or int(commit_count.stdout.strip() or "0") < 63:
+        failures.append("rollup history is unexpectedly short for PRs 1..63")
 
     required_internal = {
         "independent_security_finance_audit",
@@ -67,6 +67,7 @@ def main() -> int:
         "migration_recovery_drill",
         "external_provider_intake_packet",
         "professional_review_packet",
+        "external_blocker_tracking",
     }
 
     evidence_by_category = {item["category"]: item["status"] for item in evidence["evidence"]}
@@ -80,6 +81,7 @@ def main() -> int:
         "migration_recovery_drill": "build/migration-recovery-drill.json",
         "external_provider_intake_packet": "docs/28-external-provider-sandbox-intake.md",
         "professional_review_packet": "docs/29-professional-independent-review-packet.md",
+        "external_blocker_tracking": "config/external-blockers.json",
     }
     evidence_items = {item["category"]: item for item in evidence["evidence"]}
     for category, path in artifact_hashes.items():
@@ -91,7 +93,8 @@ def main() -> int:
             failures.append(f"blocker unexpectedly satisfied or absent: {blocker}")
     action_rows = actions.get("actions", [])
     required_action_fields = {
-        "order", "id", "title", "owner", "status", "evidence", "expiry", "blocker"
+        "order", "id", "title", "owner", "status", "evidence", "expiry", "blocker",
+        "issue_number", "issue_url",
     }
     if actions.get("release") != manifest["version"] or actions.get("verdict") != "BLOCKED":
         failures.append("operator actions release identity or verdict mismatch")
@@ -102,6 +105,22 @@ def main() -> int:
             failures.append("each operator action must be complete and PENDING")
         if not row.get("evidence") or not row.get("expiry") or not row.get("blocker"):
             failures.append("operator action evidence, expiry and blocker are required")
+
+    external_issues = manifest.get("external_blocker_issues", [])
+    expected_issues = [
+        {
+            "id": f"EXT-{index:02d}",
+            "issue_number": 63 + index,
+            "url": f"https://github.com/NurionHoldings/NARANG_RIDER/issues/{63 + index}",
+            "status": "PENDING",
+        }
+        for index in range(1, 8)
+    ]
+    if external_issues != expected_issues:
+        failures.append("external blocker issues must be #64..#70 and PENDING")
+    for row, issue in zip(action_rows, expected_issues, strict=True):
+        if row.get("issue_number") != issue["issue_number"] or row.get("issue_url") != issue["url"]:
+            failures.append("operator action issue reference mismatch")
 
     report = {
         "version": manifest["version"],

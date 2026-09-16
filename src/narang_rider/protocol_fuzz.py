@@ -12,8 +12,9 @@ import math
 import posixpath
 import random
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 from urllib.parse import parse_qsl, unquote_to_bytes, urlsplit
 
 MAX_BODY_BYTES = 64 * 1024
@@ -348,7 +349,7 @@ def run_deterministic_fuzz(seed: int, count: int = 500) -> FuzzResult:
             accepted += 1
         except ProtocolError:
             rejected += 1
-        except Exception as exc:  # pragma: no cover - the invariant under test
+        except Exception as exc:  # noqa: BLE001  # pragma: no cover - fuzz invariant
             failures.append(f"{case_id}:{type(exc).__name__}")
     return FuzzResult(seed, count, accepted, rejected, tuple(failures))
 

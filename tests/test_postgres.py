@@ -219,7 +219,8 @@ def test_outbox_lease_is_bounded_and_uses_skip_locked() -> None:
 
 @pytest.mark.parametrize(
     ("sqlstate", "error_type"),
-    [("23505", ConcurrencyConflict), ("40001", ConcurrencyConflict),
+    [("23503", ConcurrencyConflict), ("23505", ConcurrencyConflict),
+     ("40001", ConcurrencyConflict),
      ("42501", TenantScopeError), ("08006", DatabaseUnavailable)],
 )
 def test_database_errors_have_stable_non_secret_mapping(

@@ -85,6 +85,9 @@ jobs:
       - name: Ruff
         run: ruff check .
 
+      - name: Python compile, source shape and import-cycle contracts
+        run: python scripts/check_python_quality.py
+
       - name: Tests
         run: pytest -q
 

@@ -46,3 +46,8 @@ test("map-free route status protects location and ARKAON advice boundaries", () 
   assert.match(app, /배차 배제·보수 삭감·제재의 근거가 아닙니다/);
   assert.match(app, /우회 주행만으로 과실을 판단하지 않습니다/);
 });
+
+test("operations labels synthetic simulation as non-production evidence", () => {
+  assert.match(app, /합성 검증 보고서/);
+  assert.match(app, /실데이터가 아닌 부하·경제성·악용 가설/);
+});

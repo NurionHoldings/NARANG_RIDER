@@ -130,6 +130,11 @@ class ProfessionalDecisionRegistry:
             reasons.append("rejected or withdrawn professional decisions exist")
         if any(decision.expires_at <= self.now for decision in self._decisions.values()):
             reasons.append("a professional decision is expired")
+        if any(
+            decision.scope != self.scope or decision.system_version != self.system_version
+            for decision in self._decisions.values()
+        ):
+            reasons.append("a recorded decision no longer matches scope or system version")
         if any(decision.conditions for decision in self._decisions.values()):
             reasons.append("unresolved professional conditions exist")
         reviewers = [decision.reviewer_identity_ref for decision in self._decisions.values()]
@@ -171,3 +176,16 @@ class ProfessionalDecisionRegistry:
             raise ProfessionalReviewRejected("conditional decision requires conditions")
         if decision.conflict_refs:
             raise ProfessionalReviewRejected("unresolved reviewer conflict")
+
+
+def admin_readiness_view(readiness: ProfessionalReadiness) -> dict[str, object]:
+    """Privacy-safe admin projection with no reviewer identity or opinion text."""
+    return {
+        "legal_approval": readiness.legal_approval,
+        "release_status": readiness.release_status,
+        "missing_disciplines": [item.value for item in readiness.missing_disciplines],
+        "conditional_disciplines": [item.value for item in readiness.conditional_disciplines],
+        "rejected_disciplines": [item.value for item in readiness.rejected_disciplines],
+        "reasons": list(readiness.reasons),
+        "notice": "전문가 검토 상태이며 정부·법원·감독기관의 승인 또는 출시 승인이 아닙니다.",
+    }

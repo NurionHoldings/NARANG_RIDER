@@ -14,6 +14,7 @@ from .incident_support import (
     IncidentReportCommand,
     IncidentService,
 )
+from .resource_limits import JsonBudget, ResourceLimitExceeded, bounded_json_object
 
 CASE_PATH = re.compile(r"^/api/v1/rider-incidents/([A-Za-z0-9_-]{3,80})$")
 ACTION_PATH = re.compile(
@@ -132,10 +133,10 @@ class IncidentApi:
     def _body(request: IncidentHttpRequest) -> dict[str, object]:
         if request.headers.get("Content-Type") != "application/json" or len(request.body) > 32_768:
             raise ValueError
-        value = json.loads(request.body)
-        if not isinstance(value, dict):
-            raise TypeError
-        return value
+        try:
+            return bounded_json_object(request.body, JsonBudget(max_bytes=32_768))
+        except ResourceLimitExceeded as error:
+            raise ValueError from error
 
     @staticmethod
     def _str(body: Mapping[str, object], key: str) -> str:

@@ -85,7 +85,7 @@ export const journeys: Readonly<Record<PortalRole, readonly JourneyAction[]>> = 
     { id: "arrive", label: "가게 도착", route: "riderProgress" },
     { id: "pickup", label: "픽업 완료", route: "riderProgress" },
     { id: "proof", label: "촬영권한 요청", route: "riderProofGrant" },
-    { id: "deliver", label: "배송 완료", route: "riderProgress" },
+    { id: "deliver", label: "배송 완료", route: "riderDelivery" },
     { id: "incident", label: "안전 중지 및 지원 요청", route: "riderIncident" },
     { id: "earnings", label: "수익 확인", route: "riderEarnings" },
   ],

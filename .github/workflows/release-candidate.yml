@@ -1,0 +1,42 @@
+name: Release candidate evidence
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "feat/044-release-candidate-readiness"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rc-evidence-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-candidate:
+    name: Traceability and blocked RC report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install project
+        run: python -m pip install -e .
+      - name: Verify declared stacked ancestry
+        run: python scripts/verify_release_stack.py
+      - name: Verify traceability and generate fail-closed report
+        run: python scripts/generate_release_candidate.py
+      - name: Assert RC remains blocked
+        run: python -c "import json; assert json.load(open('build/release-candidate-report.json'))['verdict'] == 'BLOCKED'"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-candidate-0.1.0-rc.1
+          path: build/release-candidate-report.json
+          if-no-files-found: error
+          retention-days: 30

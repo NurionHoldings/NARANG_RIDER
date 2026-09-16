@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0-rc.1",
+  "evidence": [
+    {"id":"ci-269","category":"ci_jobs","digest":"local-ci-green","status":"pass","reference":"github-actions://269"},
+    {"id":"migration-contract","category":"migrations","digest":"migration-contract-green","status":"pass","reference":"test://postgres-live"},
+    {"id":"sbom","category":"sbom","digest":"generated-in-ci","status":"pass","reference":"artifact://release-evidence"},
+    {"id":"synthetic-e2e","category":"synthetic_e2e","digest":"synthetic-only","status":"pass","reference":"artifact://local-full-stack-evidence"},
+    {"id":"pg-live","category":"postgres_live","digest":"postgres-16-green","status":"pass","reference":"test://postgres-live"},
+    {"id":"a11y-contract","category":"accessibility_contract","digest":"dom-contract-only","status":"pass","reference":"test://frontend"},
+    {"id":"capacity","category":"capacity_simulation","digest":"bounded-synthetic","status":"pass","reference":"artifact://synthetic-simulation-report"},
+    {"id":"partner-api","category":"partner_official_api","digest":null,"status":"missing"},
+    {"id":"partner-creds","category":"partner_sandbox_credentials","digest":null,"status":"missing"},
+    {"id":"maps","category":"map_provider_sandbox","digest":null,"status":"missing"},
+    {"id":"notifications","category":"notification_provider_sandbox","digest":null,"status":"missing"},
+    {"id":"insurance","category":"insurance_provider_sandbox","digest":null,"status":"missing"},
+    {"id":"counsel","category":"legal_counsel_approval","digest":null,"status":"missing"},
+    {"id":"privacy-approval","category":"privacy_officer_approval","digest":null,"status":"missing"},
+    {"id":"operator","category":"operator_approval","digest":null,"status":"missing"},
+    {"id":"main","category":"main_merge","digest":null,"status":"missing"},
+    {"id":"infra","category":"production_infrastructure","digest":null,"status":"missing"},
+    {"id":"secrets","category":"production_secret_provisioning","digest":null,"status":"missing"},
+    {"id":"pilot","category":"field_pilot","digest":null,"status":"missing"}
+  ]
+}

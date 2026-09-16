@@ -1,6 +1,7 @@
 import { ApiClient, assertRole, type RouteName, type SessionAdapter } from "./api.js";
 import { ActiveFormMutation, journeys, type PortalRole } from "./workflows.js";
 import { REQUIRED_REPORT_NOTICE, rights } from "./korean-ux.js";
+import { adminArkaonConsole } from "./admin-arkaon-console.js";
 
 class ServerSession implements SessionAdapter {
   private async value(): Promise<{ role: PortalRole; branch_id: string | null; csrf_token: string }> {
@@ -32,6 +33,7 @@ export async function mount(root: HTMLElement, session: SessionAdapter = new Ser
   ${role === "customer" ? `<section aria-labelledby="delivery-notice"><h2 id="delivery-notice">배송 외관 확인</h2><p>${REQUIRED_REPORT_NOTICE}</p></section>` : ""}
   <section class="cards" aria-labelledby="tasks-heading"><h2 id="tasks-heading" class="section-heading">주요 업무</h2>${journeys[role].map(action => `<form data-action="${action.id}" data-route="${action.route}" aria-describedby="form-help form-error"><h3>${action.label}</h3><label for="note-${action.id}">처리 메모</label><input id="note-${action.id}" name="note" autocomplete="off">${action.id === "notifications" ? `<label class="choice"><input name="optional-consent" type="checkbox"> 선택 알림 수신에 동의합니다</label>` : ""}${action.destructive ? `<label class="choice"><input name="confirmed" type="checkbox" required> 결과를 확인했고 이 작업을 요청합니다</label>` : ""}<button type="submit"${action.destructive ? ` class="danger"` : ""}>${action.label}</button></form>`).join("")}</section>
   <button id="retry" type="button" hidden>다시 시도</button>${roleGuidance(role)}
+  ${role === "branch-ops" ? adminArkaonConsole() : ""}
   <p>아르카온 예상시간은 참고 정보이며 배차 배제·보수 삭감·제재의 근거가 아닙니다. 우회 주행만으로 과실을 판단하지 않습니다.</p>
   <nav class="rights" aria-labelledby="rights-heading"><h2 id="rights-heading">내 권리와 선택</h2><ul>${rights.map(right => `<li><a href="/rights#${encodeURIComponent(right)}">${right}</a></li>`).join("")}</ul><p>안내 확인 여부나 선택 동의 거부만으로 환불·이의제기·배차·보수 권리를 제한하지 않습니다.</p></nav>
   <aside aria-live="polite">오류·중복 요청은 자동 송금이나 책임 확정 없이 다시 확인합니다.</aside></main>

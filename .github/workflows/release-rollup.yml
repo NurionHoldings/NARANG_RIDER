@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Verify ancestry, contiguous PR inventory and blockers
-        run: python scripts/verify_release_rollup.py
+        run: python scripts/verify_release_rollup.py --head "${{ github.event.pull_request.head.sha }}"
       - uses: actions/upload-artifact@v4
         with:
           name: release-rollup-0.1.0-rc.2

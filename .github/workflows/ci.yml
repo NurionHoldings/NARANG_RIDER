@@ -88,8 +88,17 @@ jobs:
       - name: Tests
         run: pytest -q
 
+      - name: Bounded synthetic load and abuse simulation
+        run: python scripts/run_synthetic_simulation.py --profile smoke > synthetic-simulation-report.json
+
       - name: Whitespace errors
         run: git diff --check
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-simulation-report
+          path: synthetic-simulation-report.json
+          retention-days: 14
 
   live-postgres:
     name: PostgreSQL 16 integration
